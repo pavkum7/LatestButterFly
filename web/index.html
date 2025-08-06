@@ -1116,16 +1116,17 @@
                 if (!redRose.collected) {
                     if (!gameState.isBeeDead && isColliding(gameState.butterfly, redRose)) {
                         redRose.collected = true;
-                        // Random effect: 50% chance for 10 points, 50% chance for speed boost
+                        // Random effect: 50% chance for 10 points, 50% chance for speed boost + 8 points
                         if (Math.random() < 0.5) {
                             gameState.score1 += 10; // Extra 10 points
                             console.log("Red rose gave 10 extra points!");
                         } else {
-                            // Increase speed of all objects by 7
+                            // Increase speed of all objects by 7 AND add 8 points
                             gameState.globalSpeed += 7;
+                            gameState.score1 += 8; // Add 8 points when speed increases
                             // Update all existing objects
                             updateAllObjectSpeeds();
-                            console.log("Red rose increased speed by 7! New speed: " + gameState.globalSpeed);
+                            console.log("Red rose increased speed by 7 and gave 8 points! New speed: " + gameState.globalSpeed);
                         }
                         if (gameState.gameMode === 'onePlayer') {
                             if (gameState.score1 > gameState.highScore1Player) {
@@ -1142,16 +1143,17 @@
                         }
                     } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, redRose)) {
                         redRose.collected = true;
-                        // Random effect: 50% chance for 10 points, 50% chance for speed boost
+                        // Random effect: 50% chance for 10 points, 50% chance for speed boost + 8 points
                         if (Math.random() < 0.5) {
                             gameState.score2 += 10; // Extra 10 points
                             console.log("Red rose gave 10 extra points!");
                         } else {
-                            // Increase speed of all objects by 7
+                            // Increase speed of all objects by 7 AND add 8 points
                             gameState.globalSpeed += 7;
+                            gameState.score2 += 8; // Add 8 points when speed increases
                             // Update all existing objects
                             updateAllObjectSpeeds();
-                            console.log("Red rose increased speed by 7! New speed: " + gameState.globalSpeed);
+                            console.log("Red rose increased speed by 7 and gave 8 points! New speed: " + gameState.globalSpeed);
                         }
                         if (gameState.gameMode === 'onePlayer') {
                             if (gameState.score2 > gameState.highScore2Player) {
