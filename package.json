@@ -1,0 +1,26 @@
+{
+  "name": "flutter-dodge-game",
+  "version": "1.0.0",
+  "description": "A Flutter arcade game where a butterfly dodges nets and collects flowers - Web Version",
+  "main": "web/index.html",
+  "scripts": {
+    "start": "python3 run_web_server.py",
+    "build": "echo 'Static build completed'",
+    "dev": "python3 run_web_server.py"
+  },
+  "keywords": [
+    "flutter",
+    "game",
+    "butterfly",
+    "arcade",
+    "web",
+    "html5",
+    "canvas"
+  ],
+  "author": "pavkum7",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pavkum7/LatestButterFly.git"
+  }
+} 
