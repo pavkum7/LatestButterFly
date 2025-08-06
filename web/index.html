@@ -1,0 +1,2051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutter Dodge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #4A7C59;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        #gameContainer {
+            position: relative;
+            border: 2px solid #333;
+            background: #4A7C59;
+        }
+        
+        #gameCanvas {
+            display: block;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        
+        #pauseButton {
+            pointer-events: auto !important;
+        }
+        
+        .score {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        
+        #gameOver h1 {
+            color: #ff4444;
+            margin: 0 0 20px 0;
+            font-size: 32px;
+        }
+        
+        #gameOver button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        #gameOver button:hover {
+            background: #45a049;
+        }
+        
+        #menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            min-width: 600px;
+        }
+        
+        #menu h1 {
+            color: #2196F3;
+            margin: 0 0 20px 0;
+            font-size: 32px;
+        }
+        
+        #menu button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 0;
+            display: inline-block;
+            width: 150px;
+            flex-shrink: 0;
+        }
+        
+        #menu button:nth-child(3) {
+            background: #2196F3;
+        }
+        
+        #menu button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui">
+            <div id="score1">🐝 Score: 0</div>
+            <div id="highScore1">🐝 High Score: 0</div>
+            <div id="score2" style="display: none;">🦋 Score: 0</div>
+            <div id="highScore2" style="display: none;">🦋 High Score: 0</div>
+        </div>
+        <button id="pauseButton" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: #ff4444; color: white; border: none; border-radius: 30px; width: 60px; height: 60px; font-size: 24px; cursor: pointer; display: none; z-index: 1000;">⏸️</button>
+        
+        <!-- Control buttons -->
+        <div id="controls" style="display: none;">
+            <!-- Left side - W and S buttons for butterfly (2-player mode only) -->
+            <div id="butterflyLabel" style="
+                position: fixed; 
+                bottom: 180px; 
+                left: 20px; 
+                font-size: 24px; 
+                color: white;
+                display: none;
+            ">🦋</div>
+            <button id="wButton" style="
+                position: fixed; 
+                bottom: 100px; 
+                left: 20px; 
+                width: 80px; 
+                height: 80px; 
+                background-color: rgba(128, 0, 128, 0.8); 
+                border: 3px solid white; 
+                border-radius: 50%; 
+                color: white; 
+                font-size: 32px; 
+                font-weight: bold;
+                cursor: pointer;
+                display: none;
+            ">W</button>
+            <button id="sButton" style="
+                position: fixed; 
+                bottom: 20px; 
+                left: 20px; 
+                width: 80px; 
+                height: 80px; 
+                background-color: rgba(128, 0, 128, 0.8); 
+                border: 3px solid white; 
+                border-radius: 50%; 
+                color: white; 
+                font-size: 32px; 
+                font-weight: bold;
+                cursor: pointer;
+                display: none;
+            ">S</button>
+            
+            <!-- Right side - Up and Down buttons for bee -->
+            <div id="beeLabel" style="
+                position: fixed; 
+                bottom: 180px; 
+                right: 20px; 
+                font-size: 24px; 
+                color: white;
+            ">🐝</div>
+            <button id="upButton" style="
+                position: fixed; 
+                bottom: 100px; 
+                right: 20px; 
+                width: 80px; 
+                height: 80px; 
+                background-color: rgba(0, 123, 255, 0.8); 
+                border: 3px solid white; 
+                border-radius: 50%; 
+                color: white; 
+                font-size: 24px; 
+                cursor: pointer;
+            ">↑</button>
+            <button id="downButton" style="
+                position: fixed; 
+                bottom: 20px; 
+                right: 20px; 
+                width: 80px; 
+                height: 80px; 
+                background-color: rgba(0, 123, 255, 0.8); 
+                border: 3px solid white; 
+                border-radius: 50%; 
+                color: white; 
+                font-size: 24px; 
+                cursor: pointer;
+            ">↓</button>
+        </div>
+        <div id="gameOver">
+            <h1>Game Over!</h1>
+            <p id="finalScore">🐝 Bee Score: 0<br>🦋 Butterfly Score: 0</p>
+            <button onclick="returnToMenu()">Back to Menu</button>
+        </div>
+        <div id="pauseOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; z-index: 1000;">
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);">
+                <h2 style="color: #ff4444; margin: 0 0 20px 0; font-size: 28px;">Game Paused</h2>
+                <div style="margin: 20px 0; line-height: 1.6; color: #333;">
+                    <p style="margin: 10px 0; font-size: 18px;"><strong>Don't touch the birds</strong></p>
+                    <p style="margin: 10px 0; font-size: 18px;"><strong>Get as many flowers</strong></p>
+                    <p style="margin: 10px 0; font-size: 18px;"><strong>Get blue flowers for points</strong></p>
+                    <p style="margin: 10px 0; font-size: 18px;"><strong>NO MESSING WITH OTHERS</strong></p>
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                    <button onclick="resumeGame()" style="background: #4CAF50; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; cursor: pointer;">Resume</button>
+                    <button id="quitButton" onclick="showQuitConfirm()" style="background: #ff4444; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold;">QUIT???</button>
+                </div>
+                <button id="confirmQuitButton" onclick="confirmQuit()" style="background: #ff0000; color: white; border: none; padding: 15px 30px; border-radius: 10px; font-size: 18px; cursor: pointer; font-weight: bold; margin-top: 15px; display: none;">ARE YOU SURE???</button>
+            </div>
+        </div>
+        
+        <div id="menu">
+            <h1>Select Game Mode</h1>
+            <div style="display: flex; align-items: center; margin: 10px 0;">
+                <button onclick="selectOnePlayer()">1 Player</button>
+                <span style="margin-left: 16px; color: #666; font-size: 14px;">Use up and down buttons on the keyboard to control bee</span>
+            </div>
+            <div style="display: flex; align-items: center; margin: 10px 0;">
+                <button onclick="selectTwoPlayer()">HEAD TO HEAD</button>
+                <span style="margin-left: 16px; color: #666; font-size: 14px;">Use up and down buttons on the keyboard to control bee and Use W and S buttons on the keyboard to control butterfly</span>
+            </div>
+            <div style="display: flex; align-items: center; margin: 10px 0;">
+                <button onclick="selectTeams()" style="background-color: #9c27b0;">Teams</button>
+                <span style="margin-left: 16px; color: #666; font-size: 14px;">Both bee and butterfly work together with combined score</span>
+            </div>
+            <div style="display: flex; align-items: center; margin: 20px 0;">
+                <button onclick="showRules()" style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer;">Rules</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rules Popup -->
+    <div id="rulesPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 30px; border-radius: 15px; max-width: 500px; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+            <h2 style="color: #333; margin-bottom: 20px; font-size: 24px;">GAME RULES</h2>
+            <div style="text-align: left; line-height: 1.6; font-size: 16px; color: #555;">
+                <p style="margin: 10px 0; font-weight: bold; color: #d32f2f;">🚫 DON'T TOUCH THE BIRDS</p>
+                <p style="margin: 10px 0; font-weight: bold; color: #2e7d32;">🌸 GET AS MANY FLOWERS AS POSSIBLE</p>
+                <p style="margin: 10px 0; font-weight: bold; color: #c62828;">🌹 THE RED FLOWER WILL EITHER GIVE YOU 10 POINTS OR INCREASE SPEED</p>
+                <p style="margin: 10px 0; font-weight: bold; color: #f57c00;">🌻 THE GOLD FLOWER WILL GIVE 5 POINTS AND WILL MAKE YOU FASTER FOR 10 SECONDS</p>
+                <p style="margin: 10px 0; font-weight: bold; color: #7b1fa2;">💜 THE PURPLE HEART WILL GIVE 7 POINTS AND WILL GIVE YOU IMMORTALITY FOR 15 SECONDS</p>
+                <p style="margin: 10px 0; font-weight: bold; color: #1976d2;">💙 BLUE FLOWERS: 15 POINTS + 30-SECOND IMMORTALITY</p>
+                <p style="margin: 10px 0; font-weight: bold; color: #757575;">🤍 WHITE FLOWERS: CHANCE OF 20 POINTS OR INCREASING BIRD SPAWN RATES</p>
+            </div>
+            <button onclick="hideRules()" style="background-color: #4CAF50; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 20px; font-weight: bold;">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const score1Element = document.getElementById('score1');
+        const score2Element = document.getElementById('score2');
+        const highScore1Element = document.getElementById('highScore1');
+        const highScore2Element = document.getElementById('highScore2');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+        const menuElement = document.getElementById('menu');
+        const pauseButton = document.getElementById('pauseButton');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+        
+        // Show menu on start
+        menuElement.style.display = 'block';
+        
+        // Game state
+        let gameState = {
+            butterfly: { x: 100, y: 300, width: 32, height: 32, speed: 8, baseSpeed: 8, hasSpeedBoost: false, isSlowed: false, hasImmunity: false, speedBoostEndTime: null, slowEndTime: null, immunityEndTime: null },
+            butterfly2: { x: 100, y: 300, width: 32, height: 32, speed: 8, baseSpeed: 8, hasSpeedBoost: false, isSlowed: false, hasImmunity: false, speedBoostEndTime: null, slowEndTime: null, immunityEndTime: null },
+            flowers: [],
+            goldenFlowers: [],
+            purpleFlowers: [],
+            birds: [],
+            nets: [],
+            giantBirds: [],
+            score1: 0, // Bee score
+            score2: 0, // Butterfly score
+            highScore1: 0, // Bee high score (2-player mode)
+            highScore2: 0, // Butterfly high score (2-player mode)
+            highScore1Player: 0, // 1-player mode high score
+            highScore2Player: 0, // 2-player mode high score
+            highScoreTeams: 0, // Teams mode high score
+            flowersCollected1: 0, // Bee flowers collected
+            flowersCollected2: 0, // Butterfly flowers collected
+            isBeeDead: false,
+            isButterflyDead: false,
+            gameMode: 'twoPlayer', // 'onePlayer', 'twoPlayer', or 'teams'
+            gameStatus: 'menu', // 'menu', 'playing', 'paused', 'gameOver'
+            isGlobalSlow: false,
+            globalSlowEndTime: null,
+            isImmunityFlashing: false,
+            gameOver: false,
+            screenWidth: 800,
+            screenHeight: 600,
+            globalSpeed: 8, // Global speed that increases every 15 flowers
+            lastSpeedIncrease: 0, // Track when speed was last increased
+            redRoses: [], // Array to store red roses
+            lastRedRoseSpawn: 0, // Track when red rose was last spawned
+            blueFlowers: [], // Array to store blue flowers
+            lastBlueFlowerSpawn: 0, // Track when blue flower was last spawned
+            whiteFlowers: [], // Array to store white flowers
+            lastWhiteFlowerSpawn: 0 // Track when white flower was last spawned
+        };
+        
+        function selectOnePlayer() {
+            gameState.gameMode = 'onePlayer';
+            gameState.gameStatus = 'playing';
+            menuElement.style.display = 'none';
+            controlsElement.style.display = 'block';
+            wButton.style.display = 'none';
+            sButton.style.display = 'none';
+            butterflyLabel.style.display = 'none'; // Hide butterfly label for 1-player
+            pauseButton.style.display = 'block'; // Show pause button
+            resetGame();
+        }
+        
+        function selectTwoPlayer() {
+            gameState.gameMode = 'twoPlayer';
+            gameState.gameStatus = 'playing';
+            menuElement.style.display = 'none';
+            controlsElement.style.display = 'block';
+            wButton.style.display = 'block';
+            sButton.style.display = 'block';
+            butterflyLabel.style.display = 'block'; // Show butterfly label for 2-player
+            pauseButton.style.display = 'block'; // Show pause button
+            resetGame();
+        }
+        
+        function selectTeams() {
+            gameState.gameMode = 'teams';
+            gameState.gameStatus = 'playing';
+            menuElement.style.display = 'none';
+            controlsElement.style.display = 'block';
+            wButton.style.display = 'block';
+            sButton.style.display = 'block';
+            butterflyLabel.style.display = 'block'; // Show butterfly label for teams
+            pauseButton.style.display = 'block'; // Show pause button
+            resetGame();
+        }
+        
+        function pauseGame() {
+            if (gameState.gameStatus === 'playing') {
+                gameState.gameStatus = 'paused';
+                pauseOverlay.style.display = 'block';
+            }
+        }
+        
+        function resumeGame() {
+            if (gameState.gameStatus === 'paused') {
+                gameState.gameStatus = 'playing';
+                pauseOverlay.style.display = 'none';
+                // Hide confirm quit button when resuming
+                document.getElementById('confirmQuitButton').style.display = 'none';
+            }
+        }
+        
+        function showQuitConfirm() {
+            document.getElementById('confirmQuitButton').style.display = 'block';
+        }
+        
+        function confirmQuit() {
+            gameState.gameStatus = 'menu';
+            pauseOverlay.style.display = 'none';
+            menuElement.style.display = 'block';
+            controlsElement.style.display = 'none';
+            pauseButton.style.display = 'none';
+            // Hide confirm quit button
+            document.getElementById('confirmQuitButton').style.display = 'none';
+            // Reset game state
+            resetGame();
+        }
+
+        // Input handling
+        let isMovingUp = false;
+        let isMovingDown = false;
+        let isMovingButterfly2Up = false;
+        let isMovingButterfly2Down = false;
+
+        // Button controls
+        const upButton = document.getElementById('upButton');
+        const downButton = document.getElementById('downButton');
+        const wButton = document.getElementById('wButton');
+        const sButton = document.getElementById('sButton');
+        const butterflyLabel = document.getElementById('butterflyLabel');
+        const beeLabel = document.getElementById('beeLabel');
+        const controlsElement = document.getElementById('controls');
+        
+        // Bee controls (right side)
+        upButton.addEventListener('mousedown', () => {
+            isMovingUp = true;
+        });
+        
+        upButton.addEventListener('mouseup', () => {
+            isMovingUp = false;
+        });
+        
+        upButton.addEventListener('mouseleave', () => {
+            isMovingUp = false;
+        });
+        
+        downButton.addEventListener('mousedown', () => {
+            isMovingDown = true;
+        });
+        
+        downButton.addEventListener('mouseup', () => {
+            isMovingDown = false;
+        });
+        
+        downButton.addEventListener('mouseleave', () => {
+            isMovingDown = false;
+        });
+        
+        // Butterfly controls (left side)
+        wButton.addEventListener('mousedown', () => {
+            isMovingButterfly2Up = true;
+        });
+        
+        wButton.addEventListener('mouseup', () => {
+            isMovingButterfly2Up = false;
+        });
+        
+        wButton.addEventListener('mouseleave', () => {
+            isMovingButterfly2Up = false;
+        });
+        
+        sButton.addEventListener('mousedown', () => {
+            isMovingButterfly2Down = true;
+        });
+        
+        sButton.addEventListener('mouseup', () => {
+            isMovingButterfly2Down = false;
+        });
+        
+        sButton.addEventListener('mouseleave', () => {
+            isMovingButterfly2Down = false;
+        });
+        
+        // Pause button event listener
+        pauseButton.addEventListener('click', () => {
+            pauseGame();
+        });
+        
+        // Touch events for mobile
+        upButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isMovingUp = true;
+        });
+        
+        upButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isMovingUp = false;
+        });
+        
+        downButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isMovingDown = true;
+        });
+        
+        downButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isMovingDown = false;
+        });
+        
+        wButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isMovingButterfly2Up = true;
+        });
+        
+        wButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isMovingButterfly2Up = false;
+        });
+        
+        sButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isMovingButterfly2Down = true;
+        });
+        
+        sButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isMovingButterfly2Down = false;
+        });
+
+        // Keyboard event listeners
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            handleInput(y);
+        }
+
+        function handleMouseMove(e) {
+            if (e.buttons === 1) {
+                const rect = canvas.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                handleInput(y);
+            }
+        }
+
+        function handleMouseUp() {
+            isMovingUp = false;
+            isMovingDown = false;
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            handleInput(y);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            handleInput(y);
+        }
+
+        function handleTouchEnd() {
+            isMovingUp = false;
+            isMovingDown = false;
+        }
+
+        function handleKeyDown(e) {
+            if (gameState.gameStatus === 'menu' || gameState.gameStatus === 'gameOver') return;
+            
+            // Handle pause/resume with Escape key
+            if (e.key === 'Escape') {
+                if (gameState.gameStatus === 'playing') {
+                    pauseGame();
+                } else if (gameState.gameStatus === 'paused') {
+                    resumeGame();
+                }
+                return;
+            }
+            
+            if (gameState.gameStatus !== 'playing') return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'Up':
+                    e.preventDefault();
+                    isMovingUp = true;
+                    isMovingDown = false;
+                    break;
+                case 'ArrowDown':
+                case 'Down':
+                    e.preventDefault();
+                    isMovingUp = false;
+                    isMovingDown = true;
+                    break;
+                case 'w':
+                case 'W':
+                    if (gameState.gameMode === 'twoPlayer' || gameState.gameMode === 'teams') {
+                        e.preventDefault();
+                        isMovingButterfly2Up = true;
+                        isMovingButterfly2Down = false;
+                    }
+                    break;
+                case 's':
+                case 'S':
+                    if (gameState.gameMode === 'twoPlayer' || gameState.gameMode === 'teams') {
+                        e.preventDefault();
+                        isMovingButterfly2Up = false;
+                        isMovingButterfly2Down = true;
+                    }
+                    break;
+            }
+        }
+        
+        function handleKeyUp(e) {
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'Up':
+                    isMovingUp = false;
+                    break;
+                case 'ArrowDown':
+                case 'Down':
+                    isMovingDown = false;
+                    break;
+                case 'w':
+                case 'W':
+                    if (gameState.gameMode === 'twoPlayer' || gameState.gameMode === 'teams') {
+                        isMovingButterfly2Up = false;
+                    }
+                    break;
+                case 's':
+                case 'S':
+                    if (gameState.gameMode === 'twoPlayer' || gameState.gameMode === 'teams') {
+                        isMovingButterfly2Down = false;
+                    }
+                    break;
+            }
+        }
+
+        function handleInput(y) {
+            if (gameState.gameOver) return;
+            
+            const centerY = canvas.height / 2;
+            if (y < centerY) {
+                isMovingUp = true;
+                isMovingDown = false;
+            } else {
+                isMovingUp = false;
+                isMovingDown = true;
+            }
+        }
+
+        function moveButterfly2Up() {
+            if (gameState.butterfly2.y > 0) {
+                gameState.butterfly2.y -= gameState.butterfly2.speed;
+            }
+        }
+
+        function moveButterfly2Down() {
+            if (gameState.butterfly2.y < canvas.height - gameState.butterfly2.height) {
+                gameState.butterfly2.y += gameState.butterfly2.speed;
+            }
+        }
+
+        // Game functions
+        function updateGame() {
+            if (gameState.gameStatus !== 'playing') return;
+            
+            // Update global slow effect
+            updateGlobalSlow();
+            
+            // Update immunity flashing effect
+            if (gameState.butterfly.hasImmunity && gameState.butterfly.immunityEndTime) {
+                const remainingSeconds = (gameState.butterfly.immunityEndTime - Date.now()) / 1000;
+                gameState.isImmunityFlashing = remainingSeconds <= 5 && remainingSeconds > 0;
+            } else {
+                gameState.isImmunityFlashing = false;
+            }
+            
+            // Update speed effects
+            updateSpeedEffects();
+            
+            // Update bee movement
+            if (isMovingUp && gameState.butterfly.y > 0) {
+                gameState.butterfly.y -= gameState.butterfly.speed;
+            }
+            if (isMovingDown && gameState.butterfly.y < canvas.height - gameState.butterfly.height) {
+                gameState.butterfly.y += gameState.butterfly.speed;
+            }
+            
+            // Update butterfly2 movement (only in 2-player mode or teams mode)
+            if (gameState.gameMode === 'twoPlayer' || gameState.gameMode === 'teams') {
+                if (isMovingButterfly2Up && gameState.butterfly2.y > 0) {
+                    gameState.butterfly2.y -= gameState.butterfly2.speed;
+                }
+                if (isMovingButterfly2Down && gameState.butterfly2.y < canvas.height - gameState.butterfly2.height) {
+                    gameState.butterfly2.y += gameState.butterfly2.speed;
+                }
+            }
+
+            // Update flowers
+            gameState.flowers.forEach(flower => {
+                flower.x -= flower.speed;
+            });
+            gameState.flowers = gameState.flowers.filter(flower => flower.x + flower.width > 0);
+
+            // Update golden flowers
+            gameState.goldenFlowers.forEach(goldenFlower => {
+                goldenFlower.x -= goldenFlower.speed;
+            });
+            gameState.goldenFlowers = gameState.goldenFlowers.filter(goldenFlower => goldenFlower.x + goldenFlower.width > 0);
+            
+            // Update purple flowers
+            gameState.purpleFlowers.forEach(purpleFlower => {
+                purpleFlower.x -= purpleFlower.speed;
+            });
+            gameState.purpleFlowers = gameState.purpleFlowers.filter(purpleFlower => purpleFlower.x + purpleFlower.width > 0);
+
+            // Update red roses
+            gameState.redRoses.forEach(redRose => {
+                redRose.x -= redRose.speed;
+            });
+            gameState.redRoses = gameState.redRoses.filter(redRose => redRose.x + redRose.width > 0);
+
+            // Update blue flowers
+            gameState.blueFlowers.forEach(blueFlower => {
+                blueFlower.x -= blueFlower.speed;
+            });
+            gameState.blueFlowers = gameState.blueFlowers.filter(blueFlower => blueFlower.x + blueFlower.width > 0);
+            
+            // Update white flowers
+            gameState.whiteFlowers.forEach(whiteFlower => {
+                whiteFlower.x -= whiteFlower.speed;
+            });
+            gameState.whiteFlowers = gameState.whiteFlowers.filter(whiteFlower => whiteFlower.x + whiteFlower.width > 0);
+
+            // Update birds
+            gameState.birds.forEach(bird => {
+                bird.x -= bird.speed;
+            });
+            gameState.birds = gameState.birds.filter(bird => bird.x + bird.width > 0);
+
+            // Update nets
+            gameState.nets.forEach(net => {
+                net.x -= net.speed;
+            });
+            gameState.nets = gameState.nets.filter(net => net.x + net.width > 0);
+
+            // Update giant birds (coming from the front)
+            gameState.giantBirds.forEach(giantBird => {
+                // Move from right to left (from front to back)
+                giantBird.x -= giantBird.speed;
+                
+                // Move towards butterfly's Y position
+                if (giantBird.y < gameState.butterfly.y) {
+                    giantBird.y += giantBird.speed * 0.5; // Move down
+                } else if (giantBird.y > gameState.butterfly.y) {
+                    giantBird.y -= giantBird.speed * 0.5; // Move up
+                }
+            });
+            gameState.giantBirds = gameState.giantBirds.filter(giantBird => giantBird.x + giantBird.width < 0);
+
+            // Spawn new flowers (max 5 per screen)
+            if (gameState.flowers.length < 5 && Math.random() < 0.09) {
+                spawnFlower();
+            }
+
+            // Spawn new birds (max 15 per screen)
+            if (gameState.birds.length < 15 && Math.random() < 0.10) {
+                spawnBird();
+            }
+
+            // Spawn new nets (very rare)
+            if (gameState.nets.length < 2 && Math.random() < 0.02) {
+                spawnNet();
+            }
+
+            // Check collisions
+            checkCollisions();
+        }
+
+        function spawnFlower() {
+            const baseSpeed = gameState.globalSpeed - 5; // Flowers move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.flowers.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false
+            });
+        }
+
+        function spawnGoldenFlower() {
+            const baseSpeed = gameState.globalSpeed - 5; // Golden flowers move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.goldenFlowers.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false
+            });
+        }
+
+        function spawnNet() {
+            const baseSpeed = gameState.globalSpeed - 5; // Nets move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.nets.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 32),
+                width: 32,
+                height: 32,
+                speed: speed,
+                collected: false
+            });
+        }
+
+        function spawnGiantBird() {
+            // Giant birds are immune to global slow effect
+            const baseSpeed = gameState.globalSpeed - 3; // Giant birds move slightly slower than butterflies
+            gameState.giantBirds.push({
+                x: canvas.width, // Start from the front (right side) of the screen
+                y: Math.random() * (canvas.height - 64),
+                width: 64,
+                height: 64,
+                speed: baseSpeed,
+                isAttracted: false,
+                passedTime: null
+            });
+        }
+        
+        function spawnPurpleFlower() {
+            const baseSpeed = gameState.globalSpeed - 5; // Purple flowers move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.purpleFlowers.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false
+            });
+        }
+
+        function spawnBird() {
+            const baseSpeed = gameState.globalSpeed - 5; // Birds move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            const isGiantBird = Math.random() < 0.3; // 30% chance to be a giant bird
+            gameState.birds.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 32),
+                width: 32,
+                height: 32,
+                speed: speed,
+                isGiantBird: isGiantBird
+            });
+        }
+
+        function spawnRedRose() {
+            const baseSpeed = gameState.globalSpeed - 5; // Red roses move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.redRoses.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false
+            });
+        }
+
+        function spawnBlueFlower() {
+            const baseSpeed = gameState.globalSpeed - 5; // Blue flowers move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.blueFlowers.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false
+            });
+        }
+        
+        function spawnWhiteFlower() {
+            const baseSpeed = gameState.globalSpeed - 3; // White flowers move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
+            gameState.whiteFlowers.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false
+            });
+            console.log("White flower spawned! Total white flowers:", gameState.whiteFlowers.length);
+        }
+
+        function checkCollisions() {
+            // Check flower collisions
+            gameState.flowers.forEach(flower => {
+                if (!flower.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, flower)) {
+                        flower.collected = true;
+                        gameState.score1 += 1;
+                        gameState.flowersCollected1 += 1;
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                        
+                        // Check if we should spawn a golden flower (every 15 points)
+                        if (gameState.score1 % 15 === 0) {
+                            spawnGoldenFlower();
+                        }
+                        
+                        // Check if we should spawn a giant bird (every 50 flowers collected)
+                        if (gameState.flowersCollected1 % 50 === 0 && gameState.flowersCollected1 > 0) {
+                            spawnGiantBird();
+                        }
+                        
+                        // Check if we should spawn a purple flower (every 25 flowers collected)
+                        if (gameState.flowersCollected1 % 25 === 0 && gameState.flowersCollected1 > 0) {
+                            spawnPurpleFlower();
+                        }
+                        
+                        // Increase global speed every 15 flowers collected
+                        if (gameState.flowersCollected1 % 15 === 0 && gameState.flowersCollected1 > gameState.lastSpeedIncrease) {
+                            increaseGlobalSpeed();
+                            gameState.lastSpeedIncrease = gameState.flowersCollected1;
+                        }
+                        
+                        // Spawn red rose every 20 flowers collected
+                        if (gameState.flowersCollected1 % 20 === 0 && gameState.flowersCollected1 > gameState.lastRedRoseSpawn) {
+                            spawnRedRose();
+                            gameState.lastRedRoseSpawn = gameState.flowersCollected1;
+                        }
+                        
+                        // Spawn blue flower every 30 flowers collected
+                        if (gameState.flowersCollected1 % 30 === 0 && gameState.flowersCollected1 > gameState.lastBlueFlowerSpawn) {
+                            spawnBlueFlower();
+                            gameState.lastBlueFlowerSpawn = gameState.flowersCollected1;
+                        }
+                        
+                        // Spawn white flower every 40 flowers collected
+                        if (gameState.flowersCollected1 % 40 === 0 && gameState.flowersCollected1 > gameState.lastWhiteFlowerSpawn) {
+                            console.log("Spawning white flower for bee at flowers collected:", gameState.flowersCollected1);
+                            spawnWhiteFlower();
+                            gameState.lastWhiteFlowerSpawn = gameState.flowersCollected1;
+                        }
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, flower)) {
+                        flower.collected = true;
+                        gameState.score2 += 1;
+                        gameState.flowersCollected2 += 1;
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                        
+                        // Check if we should spawn a golden flower (every 15 points)
+                        if (gameState.score2 % 15 === 0) {
+                            spawnGoldenFlower();
+                        }
+                        
+                        // Check if we should spawn a giant bird (every 50 flowers collected)
+                        if (gameState.flowersCollected2 % 50 === 0 && gameState.flowersCollected2 > 0) {
+                            spawnGiantBird();
+                        }
+                        
+                        // Check if we should spawn a purple flower (every 25 flowers collected)
+                        if (gameState.flowersCollected2 % 25 === 0 && gameState.flowersCollected2 > 0) {
+                            spawnPurpleFlower();
+                        }
+                        
+                        // Increase global speed every 15 flowers collected (for butterfly2)
+                        if (gameState.flowersCollected2 % 15 === 0 && gameState.flowersCollected2 > gameState.lastSpeedIncrease) {
+                            increaseGlobalSpeed();
+                            gameState.lastSpeedIncrease = gameState.flowersCollected2;
+                        }
+                        
+                        // Spawn red rose every 20 flowers collected (for butterfly2)
+                        if (gameState.flowersCollected2 % 20 === 0 && gameState.flowersCollected2 > gameState.lastRedRoseSpawn) {
+                            spawnRedRose();
+                            gameState.lastRedRoseSpawn = gameState.flowersCollected2;
+                        }
+                        
+                        // Spawn blue flower every 30 flowers collected (for butterfly2)
+                        if (gameState.flowersCollected2 % 30 === 0 && gameState.flowersCollected2 > gameState.lastBlueFlowerSpawn) {
+                            spawnBlueFlower();
+                            gameState.lastBlueFlowerSpawn = gameState.flowersCollected2;
+                        }
+                        
+                        // Spawn white flower every 40 flowers collected (for butterfly2)
+                        if (gameState.flowersCollected2 % 40 === 0 && gameState.flowersCollected2 > gameState.lastWhiteFlowerSpawn) {
+                            console.log("Spawning white flower for butterfly at flowers collected:", gameState.flowersCollected2);
+                            spawnWhiteFlower();
+                            gameState.lastWhiteFlowerSpawn = gameState.flowersCollected2;
+                        }
+                    }
+                }
+            });
+
+            // Check net collisions
+            gameState.nets.forEach(net => {
+                if (!net.collected) {
+                    if (!gameState.isBeeDead && !gameState.butterfly.hasImmunity && isColliding(gameState.butterfly, net)) {
+                        net.collected = true;
+                        activateGlobalSlow(); // Activate 3-second global slow effect
+                    } else if (!gameState.isButterflyDead && !gameState.butterfly2.hasImmunity && isColliding(gameState.butterfly2, net)) {
+                        net.collected = true;
+                        activateGlobalSlow(); // Activate 3-second global slow effect
+                    }
+                }
+            });
+
+            // Check golden flower collisions
+            gameState.goldenFlowers.forEach(goldenFlower => {
+                if (!goldenFlower.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, goldenFlower)) {
+                        goldenFlower.collected = true;
+                        gameState.score1 += 5; // Golden flowers worth 5 points
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                        // Activate 10-second speed boost
+                        gameState.butterfly.hasSpeedBoost = true;
+                        gameState.butterfly.speedBoostEndTime = Date.now() + 10000;
+                        gameState.butterfly.speed = gameState.butterfly.baseSpeed * 2;
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, goldenFlower)) {
+                        goldenFlower.collected = true;
+                        gameState.score2 += 5; // Golden flowers worth 5 points
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                        // Activate 10-second speed boost
+                        gameState.butterfly2.hasSpeedBoost = true;
+                        gameState.butterfly2.speedBoostEndTime = Date.now() + 10000;
+                        gameState.butterfly2.speed = gameState.butterfly2.baseSpeed * 2;
+                    }
+                }
+            });
+            
+            // Check purple flower collisions
+            gameState.purpleFlowers.forEach(purpleFlower => {
+                if (!purpleFlower.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, purpleFlower)) {
+                        purpleFlower.collected = true;
+                        gameState.score1 += 7; // Purple flowers worth 7 points
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                        // Activate 15-second immunity
+                        gameState.butterfly.hasImmunity = true;
+                        gameState.butterfly.immunityEndTime = Date.now() + 15000;
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, purpleFlower)) {
+                        purpleFlower.collected = true;
+                        gameState.score2 += 7; // Purple flowers worth 7 points
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                        // Activate 15-second immunity
+                        gameState.butterfly2.hasImmunity = true;
+                        gameState.butterfly2.immunityEndTime = Date.now() + 15000;
+                    }
+                }
+            });
+
+            // Check red rose collisions
+            gameState.redRoses.forEach(redRose => {
+                if (!redRose.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, redRose)) {
+                        redRose.collected = true;
+                        // Random effect: 50% chance for 10 points, 50% chance for speed boost
+                        if (Math.random() < 0.5) {
+                            gameState.score1 += 10; // Extra 10 points
+                            console.log("Red rose gave 10 extra points!");
+                        } else {
+                            // Increase speed of all objects by 7
+                            gameState.globalSpeed += 7;
+                            // Update all existing objects
+                            updateAllObjectSpeeds();
+                            console.log("Red rose increased speed by 7! New speed: " + gameState.globalSpeed);
+                        }
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, redRose)) {
+                        redRose.collected = true;
+                        // Random effect: 50% chance for 10 points, 50% chance for speed boost
+                        if (Math.random() < 0.5) {
+                            gameState.score2 += 10; // Extra 10 points
+                            console.log("Red rose gave 10 extra points!");
+                        } else {
+                            // Increase speed of all objects by 7
+                            gameState.globalSpeed += 7;
+                            // Update all existing objects
+                            updateAllObjectSpeeds();
+                            console.log("Red rose increased speed by 7! New speed: " + gameState.globalSpeed);
+                        }
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Check blue flower collisions
+            gameState.blueFlowers.forEach(blueFlower => {
+                if (!blueFlower.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, blueFlower)) {
+                        blueFlower.collected = true;
+                        gameState.score1 += 15; // Blue flowers worth 15 points
+                        // Random effect: 50% chance for immortality, 50% chance for bird removal
+                        if (Math.random() < 0.5) {
+                            // Activate 30-second immunity
+                            gameState.butterfly.hasImmunity = true;
+                            gameState.butterfly.immunityEndTime = Date.now() + 30000;
+                            console.log("Blue flower gave 30 seconds of immortality!");
+                        } else {
+                            // Remove all birds and giant birds
+                            gameState.birds = [];
+                            gameState.giantBirds = [];
+                            console.log("🐔 Chicken emoji appeared and all birds disappeared!");
+                        }
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, blueFlower)) {
+                        blueFlower.collected = true;
+                        gameState.score2 += 15; // Blue flowers worth 15 points
+                        // Random effect: 50% chance for immortality, 50% chance for bird removal
+                        if (Math.random() < 0.5) {
+                            // Activate 30-second immunity
+                            gameState.butterfly2.hasImmunity = true;
+                            gameState.butterfly2.immunityEndTime = Date.now() + 30000;
+                            console.log("Blue flower gave 30 seconds of immortality!");
+                        } else {
+                            // Remove all birds and giant birds
+                            gameState.birds = [];
+                            gameState.giantBirds = [];
+                            console.log("🐔 Chicken emoji appeared and all birds disappeared!");
+                        }
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Check white flower collisions
+            gameState.whiteFlowers.forEach(whiteFlower => {
+                if (!whiteFlower.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, whiteFlower)) {
+                        whiteFlower.collected = true;
+                        gameState.flowersCollected1 += 1;
+                        console.log("Bee collected white flower!");
+                        
+                        // 50% chance of 20 points, 50% chance of increasing bird spawn rates
+                        if (Math.random() < 0.5) {
+                            gameState.score1 += 20; // White flowers worth 20 points
+                            console.log("White flower gave 20 points!");
+                        } else {
+                            // Increase bird spawn rates
+                            console.log("White flower increased bird spawn rates!");
+                        }
+                        
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, whiteFlower)) {
+                        whiteFlower.collected = true;
+                        gameState.flowersCollected2 += 1;
+                        console.log("Butterfly collected white flower!");
+                        
+                        // 50% chance of 20 points, 50% chance of increasing bird spawn rates
+                        if (Math.random() < 0.5) {
+                            gameState.score2 += 20; // White flowers worth 20 points
+                            console.log("White flower gave 20 points!");
+                        } else {
+                            // Increase bird spawn rates
+                            console.log("White flower increased bird spawn rates!");
+                        }
+                        
+                        if (gameState.gameMode === 'onePlayer') {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === 'teams') {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Check bird collisions
+            gameState.birds.forEach(bird => {
+                // Use different hitbox sizes based on bird type
+                let birdHitbox;
+                if (bird.isGiantBird) {
+                    // Smaller hitbox for giant birds (12px inset on all sides)
+                    birdHitbox = {
+                        x: bird.x + 12,
+                        y: bird.y + 12,
+                        width: bird.width - 24,
+                        height: bird.height - 24
+                    };
+                } else {
+                    // Smaller hitbox for regular birds (12px inset on all sides)
+                    birdHitbox = {
+                        x: bird.x + 12,
+                        y: bird.y + 12,
+                        width: bird.width - 24,
+                        height: bird.height - 24
+                    };
+                }
+                if (!gameState.butterfly.hasImmunity && isColliding(gameState.butterfly, birdHitbox) && !gameState.isBeeDead) {
+                    gameState.isBeeDead = true;
+                    checkGameOver();
+                }
+                if (!gameState.butterfly2.hasImmunity && isColliding(gameState.butterfly2, birdHitbox) && !gameState.isButterflyDead) {
+                    gameState.isButterflyDead = true;
+                    checkGameOver();
+                }
+            });
+
+            // Check giant bird collisions
+            gameState.giantBirds.forEach(giantBird => {
+                if (!gameState.butterfly.hasImmunity && isColliding(gameState.butterfly, giantBird) && !gameState.isBeeDead) {
+                    gameState.isBeeDead = true;
+                    checkGameOver();
+                }
+                if (!gameState.butterfly2.hasImmunity && isColliding(gameState.butterfly2, giantBird) && !gameState.isButterflyDead) {
+                    gameState.isButterflyDead = true;
+                    checkGameOver();
+                }
+            });
+        }
+
+        function checkGameOver() {
+            // Game over logic depends on game mode
+            if (gameState.gameMode === 'onePlayer') {
+                // In 1-player mode, game over when bee dies
+                if (gameState.isBeeDead) {
+                    gameOver();
+                }
+            } else if (gameState.gameMode === 'teams') {
+                // In teams mode, game over when both characters are dead
+                if (gameState.isBeeDead && gameState.isButterflyDead) {
+                    gameOver();
+                }
+            } else {
+                // In 2-player mode, game over only when both characters are dead
+                if (gameState.isBeeDead && gameState.isButterflyDead) {
+                    gameOver();
+                }
+            }
+        }
+
+        function updateGlobalSlow() {
+            if (gameState.isGlobalSlow && gameState.globalSlowEndTime) {
+                if (Date.now() > gameState.globalSlowEndTime) {
+                    gameState.isGlobalSlow = false;
+                    gameState.globalSlowEndTime = null;
+                    // Reset all entity speeds to normal
+                    resetAllSpeeds();
+                }
+            }
+        }
+
+        function updateSpeedEffects() {
+            // Update speed boost for butterfly 1
+            if (gameState.butterfly.hasSpeedBoost && gameState.butterfly.speedBoostEndTime) {
+                if (Date.now() > gameState.butterfly.speedBoostEndTime) {
+                    gameState.butterfly.hasSpeedBoost = false;
+                    gameState.butterfly.speedBoostEndTime = null;
+                    // Reset to base speed or slow speed
+                    if (gameState.butterfly.isSlowed) {
+                        gameState.butterfly.speed = gameState.butterfly.baseSpeed * 0.5;
+                    } else {
+                        gameState.butterfly.speed = gameState.butterfly.baseSpeed;
+                    }
+                }
+            }
+            
+            // Update slow effect for butterfly 1
+            if (gameState.butterfly.isSlowed && gameState.butterfly.slowEndTime) {
+                if (Date.now() > gameState.butterfly.slowEndTime) {
+                    gameState.butterfly.isSlowed = false;
+                    gameState.butterfly.slowEndTime = null;
+                    // Reset to base speed or boosted speed
+                    if (gameState.butterfly.hasSpeedBoost) {
+                        gameState.butterfly.speed = gameState.butterfly.baseSpeed * 2;
+                    } else {
+                        gameState.butterfly.speed = gameState.butterfly.baseSpeed;
+                    }
+                }
+            }
+            
+            // Update immunity for butterfly 1
+            if (gameState.butterfly.hasImmunity && gameState.butterfly.immunityEndTime) {
+                if (Date.now() > gameState.butterfly.immunityEndTime) {
+                    gameState.butterfly.hasImmunity = false;
+                    gameState.butterfly.immunityEndTime = null;
+                }
+            }
+
+            // Update speed boost for butterfly 2
+            if (gameState.butterfly2.hasSpeedBoost && gameState.butterfly2.speedBoostEndTime) {
+                if (Date.now() > gameState.butterfly2.speedBoostEndTime) {
+                    gameState.butterfly2.hasSpeedBoost = false;
+                    gameState.butterfly2.speedBoostEndTime = null;
+                    // Reset to base speed or slow speed
+                    if (gameState.butterfly2.isSlowed) {
+                        gameState.butterfly2.speed = gameState.butterfly2.baseSpeed * 0.5;
+                    } else {
+                        gameState.butterfly2.speed = gameState.butterfly2.baseSpeed;
+                    }
+                }
+            }
+            
+            // Update slow effect for butterfly 2
+            if (gameState.butterfly2.isSlowed && gameState.butterfly2.slowEndTime) {
+                if (Date.now() > gameState.butterfly2.slowEndTime) {
+                    gameState.butterfly2.isSlowed = false;
+                    gameState.butterfly2.slowEndTime = null;
+                    // Reset to base speed or boosted speed
+                    if (gameState.butterfly2.hasSpeedBoost) {
+                        gameState.butterfly2.speed = gameState.butterfly2.baseSpeed * 2;
+                    } else {
+                        gameState.butterfly2.speed = gameState.butterfly2.baseSpeed;
+                    }
+                }
+            }
+            
+            // Update immunity for butterfly 2
+            if (gameState.butterfly2.hasImmunity && gameState.butterfly2.immunityEndTime) {
+                if (Date.now() > gameState.butterfly2.immunityEndTime) {
+                    gameState.butterfly2.hasImmunity = false;
+                    gameState.butterfly2.immunityEndTime = null;
+                }
+            }
+        }
+
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function gameOver() {
+            gameState.gameStatus = 'gameOver';
+            if (gameState.gameMode === 'teams') {
+                finalScoreElement.textContent = `🏆 Team Score: ${getCombinedScore()}`;
+            } else if (gameState.gameMode === 'onePlayer') {
+                finalScoreElement.textContent = `🐝 Bee Score: ${gameState.score1}`;
+            } else {
+                finalScoreElement.textContent = `🐝 Bee Score: ${gameState.score1}<br>🦋 Butterfly Score: ${gameState.score2}`;
+            }
+            gameOverElement.style.display = 'block';
+        }
+
+        function activateGlobalSlow() {
+            gameState.isGlobalSlow = true;
+            gameState.globalSlowEndTime = new Date(Date.now() + 3000); // 3 second global slow
+            // Slow down all entities
+            slowAllEntities();
+        }
+
+        function slowAllEntities() {
+            // Slow down flowers
+            gameState.flowers.forEach(flower => {
+                flower.speed = 1.5; // Half speed
+            });
+            
+            // Slow down golden flowers
+            gameState.goldenFlowers.forEach(goldenFlower => {
+                goldenFlower.speed = 1.5;
+            });
+            
+            // Slow down purple flowers
+            gameState.purpleFlowers.forEach(purpleFlower => {
+                purpleFlower.speed = 1.5;
+            });
+            
+            // Slow down birds
+            gameState.birds.forEach(bird => {
+                bird.speed = 1.5;
+            });
+            
+            // Slow down nets
+            gameState.nets.forEach(net => {
+                net.speed = 1.5;
+            });
+            
+            // Giant birds are immune to global slow effect
+            // They maintain their normal speed
+        }
+
+        function resetAllSpeeds() {
+            // Reset flower speeds
+            gameState.flowers.forEach(flower => {
+                flower.speed = 3;
+            });
+            
+            // Reset golden flower speeds
+            gameState.goldenFlowers.forEach(goldenFlower => {
+                goldenFlower.speed = 3;
+            });
+            
+            // Reset purple flower speeds
+            gameState.purpleFlowers.forEach(purpleFlower => {
+                purpleFlower.speed = 3;
+            });
+            
+            // Reset bird speeds
+            gameState.birds.forEach(bird => {
+                bird.speed = 3;
+            });
+            
+            // Reset net speeds
+            gameState.nets.forEach(net => {
+                net.speed = 3;
+            });
+            
+            // Giant birds maintain their normal speed (immune to global slow)
+        }
+
+        function getCombinedScore() {
+            return gameState.score1 + gameState.score2;
+        }
+        
+        function getCombinedHighScore() {
+            return gameState.highScoreTeams;
+        }
+        
+        function resetGame() {
+            gameState.butterfly = {
+                x: 100,
+                y: 300,
+                width: 24,
+                height: 24,
+                baseSpeed: 8,
+                speed: 8,
+                hasSpeedBoost: false,
+                speedBoostEndTime: null,
+                hasImmunity: false,
+                immunityEndTime: null
+            };
+            gameState.butterfly2 = {
+                x: 100,
+                y: 300,
+                width: 24,
+                height: 24,
+                baseSpeed: 8,
+                speed: 8,
+                hasSpeedBoost: false,
+                speedBoostEndTime: null,
+                hasImmunity: false,
+                immunityEndTime: null
+            };
+            gameState.flowers = [];
+            gameState.birds = [];
+            gameState.nets = [];
+            gameState.goldenFlowers = [];
+            gameState.giantBirds = [];
+            gameState.purpleFlowers = [];
+            gameState.score1 = 0;
+            gameState.score2 = 0;
+            gameState.flowersCollected1 = 0;
+            gameState.flowersCollected2 = 0;
+            gameState.isBeeDead = false;
+            gameState.isButterflyDead = false;
+            gameState.gameStatus = 'playing';
+            gameState.globalSpeed = 8; // Reset global speed
+            gameState.lastSpeedIncrease = 0; // Reset speed increase tracking
+            gameState.redRoses = []; // Reset red roses
+            gameState.lastRedRoseSpawn = 0; // Reset red rose spawn tracking
+            gameState.blueFlowers = []; // Reset blue flowers
+            gameState.lastBlueFlowerSpawn = 0; // Reset blue flower spawn tracking
+            gameState.whiteFlowers = []; // Reset white flowers
+            gameState.lastWhiteFlowerSpawn = 0; // Reset white flower spawn tracking
+            gameOverElement.style.display = 'none';
+            controlsElement.style.display = 'block';
+        }
+
+        function updateAllObjectSpeeds() {
+            // Update both butterflies' base speed
+            gameState.butterfly.baseSpeed = gameState.globalSpeed;
+            gameState.butterfly2.baseSpeed = gameState.globalSpeed;
+            // Update current speed if not under speed effects
+            if (!gameState.butterfly.hasSpeedBoost && !gameState.butterfly.isSlowed) {
+                gameState.butterfly.speed = gameState.globalSpeed;
+            }
+            if (!gameState.butterfly2.hasSpeedBoost && !gameState.butterfly2.isSlowed) {
+                gameState.butterfly2.speed = gameState.globalSpeed;
+            }
+            
+            // Update speed of all existing flowers
+            gameState.flowers.forEach(flower => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                flower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing golden flowers
+            gameState.goldenFlowers.forEach(goldenFlower => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                goldenFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing purple flowers
+            gameState.purpleFlowers.forEach(purpleFlower => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                purpleFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing birds
+            gameState.birds.forEach(bird => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                bird.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing giant birds
+            gameState.giantBirds.forEach(giantBird => {
+                const baseSpeed = gameState.globalSpeed - 3;
+                giantBird.speed = baseSpeed; // Giant birds are immune to global slow
+            });
+            
+            // Update speed of all existing nets
+            gameState.nets.forEach(net => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                net.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing red roses
+            gameState.redRoses.forEach(redRose => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                redRose.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing blue flowers
+            gameState.blueFlowers.forEach(blueFlower => {
+                const baseSpeed = gameState.globalSpeed - 5;
+                blueFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+            
+            // Update speed of all existing white flowers
+            gameState.whiteFlowers.forEach(whiteFlower => {
+                const baseSpeed = gameState.globalSpeed - 3;
+                whiteFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+            });
+        }
+
+        function increaseGlobalSpeed() {
+            gameState.globalSpeed += 1;
+            updateAllObjectSpeeds();
+            console.log(`Speed increased! New global speed: ${gameState.globalSpeed}`);
+        }
+
+        function showRules() {
+            document.getElementById('rulesPopup').style.display = 'block';
+        }
+
+        function hideRules() {
+            document.getElementById('rulesPopup').style.display = 'none';
+        }
+
+        function returnToMenu() {
+            gameState.gameStatus = 'menu';
+            gameOverElement.style.display = 'none';
+            menuElement.style.display = 'block';
+            controlsElement.style.display = 'none';
+            wButton.style.display = 'none';
+            sButton.style.display = 'none';
+            butterflyLabel.style.display = 'none';
+            pauseButton.style.display = 'none'; // Hide pause button in menu
+            pauseOverlay.style.display = 'none'; // Hide pause overlay
+        }
+
+        function drawButterfly() {
+            ctx.save();
+
+            // Position for rotation
+            const centerX = gameState.butterfly.x + gameState.butterfly.width / 2;
+            const centerY = gameState.butterfly.y + gameState.butterfly.height / 2;
+
+            // Calculate rotation angle based on bee position
+            let rotationAngle = 0;
+            if (gameState.butterfly.y < 300) {
+                // Moving up - face slightly up and right
+                rotationAngle = 0.2;
+            } else if (gameState.butterfly.y > 300) {
+                // Moving down - face slightly down and right
+                rotationAngle = -0.2;
+            } else {
+                // Neutral position - face right
+                rotationAngle = 0.0;
+            }
+
+            // Apply rotation
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotationAngle);
+            ctx.translate(-centerX, -centerY);
+
+            // Set opacity for dead bee
+            ctx.globalAlpha = gameState.isBeeDead ? 0.3 : 1.0;
+
+            // Draw bee emoji
+            ctx.font = '32px Arial';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.fillText('🐝', gameState.butterfly.x, gameState.butterfly.y + 20);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.globalAlpha = 1.0;
+
+            ctx.restore();
+        }
+
+        function drawButterfly2() {
+            ctx.save();
+
+            // Position for rotation
+            const centerX = gameState.butterfly2.x + gameState.butterfly2.width / 2;
+            const centerY = gameState.butterfly2.y + gameState.butterfly2.height / 2;
+
+            // Calculate rotation angle based on butterfly position
+            let rotationAngle = 0;
+            if (gameState.butterfly2.y < 300) {
+                // Moving up - face slightly up and right
+                rotationAngle = 0.2;
+            } else if (gameState.butterfly2.y > 300) {
+                // Moving down - face slightly down and right
+                rotationAngle = -0.2;
+            } else {
+                // Neutral position - face right
+                rotationAngle = 0.0;
+            }
+
+            // Apply rotation
+            ctx.translate(centerX, centerY);
+            ctx.rotate(rotationAngle);
+            ctx.translate(-centerX, -centerY);
+
+            // Set opacity for dead butterfly
+            ctx.globalAlpha = gameState.isButterflyDead ? 0.3 : 1.0;
+
+            // Draw butterfly emoji
+            ctx.font = '32px Arial';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.fillText('🦋', gameState.butterfly2.x, gameState.butterfly2.y + 20);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.globalAlpha = 1.0;
+
+            ctx.restore();
+        }
+
+        function drawFlowers() {
+            gameState.flowers.forEach(flower => {
+                if (flower.collected) return;
+                
+                // Draw flower emoji with shadow
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.fillText('🌸', flower.x + flower.width/2 + 1, flower.y + flower.height/2 + 1);
+                
+                // Main emoji
+                ctx.fillStyle = '#000';
+                ctx.fillText('🌸', flower.x + flower.width/2, flower.y + flower.height/2);
+            });
+        }
+
+        function drawGoldenFlowers() {
+            gameState.goldenFlowers.forEach(goldenFlower => {
+                if (goldenFlower.collected) return;
+                
+                // Draw golden flower emoji with shadow
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Shadow
+                ctx.fillStyle = 'rgba(255, 193, 7, 0.5)';
+                ctx.fillText('🌻', goldenFlower.x + goldenFlower.width/2 + 2, goldenFlower.y + goldenFlower.height/2 + 2);
+                
+                // Main emoji
+                ctx.fillStyle = '#000';
+                ctx.fillText('🌻', goldenFlower.x + goldenFlower.width/2, goldenFlower.y + goldenFlower.height/2);
+            });
+        }
+
+        function drawBirds() {
+            gameState.birds.forEach(bird => {
+                let opacity = 1.0;
+                if (gameState.butterfly.hasImmunity) {
+                    opacity = gameState.isImmunityFlashing ? 0.8 : 0.5;
+                }
+                ctx.globalAlpha = opacity;
+                ctx.font = bird.isGiantBird ? '48px Arial' : '32px Arial';
+                ctx.shadowColor = bird.isGiantBird ? 'rgba(255, 0, 0, 0.4)' : 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.fillText(bird.isGiantBird ? '🦅' : '🐦', bird.x, bird.y + 20);
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.globalAlpha = 1.0;
+            });
+        }
+
+        function drawNets() {
+            gameState.nets.forEach(net => {
+                if (!net.collected) {
+                    let opacity = 1.0;
+                    if (gameState.butterfly.hasImmunity) {
+                        opacity = gameState.isImmunityFlashing ? 0.8 : 0.5;
+                    }
+                    ctx.globalAlpha = opacity;
+                    ctx.font = '32px Arial';
+                    ctx.shadowColor = 'rgba(128, 128, 128, 0.4)';
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+                    ctx.fillText('🕸️', net.x, net.y + 20);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.globalAlpha = 1.0;
+                }
+            });
+        }
+
+        function drawGiantBirds() {
+            gameState.giantBirds.forEach(giantBird => {
+                let opacity = 1.0;
+                if (gameState.butterfly.hasImmunity) {
+                    opacity = gameState.isImmunityFlashing ? 0.8 : 0.5;
+                }
+                ctx.globalAlpha = opacity;
+                ctx.font = '48px Arial';
+                ctx.shadowColor = 'rgba(255, 0, 0, 0.4)';
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetX = 3;
+                ctx.shadowOffsetY = 3;
+                ctx.fillText('🦅', giantBird.x, giantBird.y + 40);
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.globalAlpha = 1.0;
+            });
+        }
+
+        function drawPurpleFlowers() {
+            gameState.purpleFlowers.forEach(purpleFlower => {
+                if (!purpleFlower.collected) {
+                    ctx.font = '24px Arial';
+                    ctx.shadowColor = 'rgba(128, 0, 128, 0.5)';
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+                    ctx.fillText('💜', purpleFlower.x, purpleFlower.y + 20);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+            });
+        }
+
+        function drawRedRoses() {
+            gameState.redRoses.forEach(redRose => {
+                if (!redRose.collected) {
+                    ctx.font = '24px Arial';
+                    ctx.shadowColor = 'rgba(255, 0, 0, 0.6)';
+                    ctx.shadowBlur = 6;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillText('🌹', redRose.x, redRose.y + 20);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+            });
+        }
+
+        function drawBlueFlowers() {
+            gameState.blueFlowers.forEach(blueFlower => {
+                if (!blueFlower.collected) {
+                    ctx.font = '24px Arial';
+                    ctx.shadowColor = 'rgba(0, 0, 255, 0.6)';
+                    ctx.shadowBlur = 6;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillText('💙', blueFlower.x, blueFlower.y + 20);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+            });
+        }
+        
+        function drawWhiteFlowers() {
+            if (gameState.whiteFlowers.length > 0) {
+                console.log("Drawing white flowers:", gameState.whiteFlowers.length);
+            }
+            gameState.whiteFlowers.forEach(whiteFlower => {
+                if (!whiteFlower.collected) {
+                    ctx.font = '24px Arial';
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
+                    ctx.shadowBlur = 6;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillText('🤍', whiteFlower.x, whiteFlower.y + 20);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+            });
+        }
+
+        function drawBackground() {
+            // Draw clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 3; i++) {
+                const x = (canvas.width / 4) * i;
+                const y = 50 + (i % 2) * 80;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 15, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 30, y, 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawStaticBackground() {
+            // Draw static clouds for menu
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 3; i++) {
+                const x = (canvas.width / 4) * i;
+                const y = 50 + (i % 2) * 80;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 15, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 30, y, 25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawUI() {
+            if (gameState.gameMode === 'teams') {
+                score1Element.textContent = `🏆 Team Score: ${getCombinedScore()}`;
+                highScore1Element.textContent = `🏆 High Score: ${getCombinedHighScore()}`;
+                score2Element.style.display = 'none';
+                highScore2Element.style.display = 'none';
+            } else {
+                score1Element.textContent = `🐝 Score: ${gameState.score1}`;
+                highScore1Element.textContent = `🐝 High Score: ${gameState.gameMode === 'onePlayer' ? gameState.highScore1Player : gameState.highScore1}`;
+                
+                if (gameState.gameMode === 'twoPlayer') {
+                    score2Element.textContent = `🦋 Score: ${gameState.score2}`;
+                    highScore2Element.textContent = `🦋 High Score: ${gameState.highScore2}`;
+                    score2Element.style.display = 'block';
+                    highScore2Element.style.display = 'block';
+                } else {
+                    score2Element.style.display = 'none';
+                    highScore2Element.style.display = 'none';
+                }
+            }
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.fillStyle = '#4A7C59';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            drawBackground();
+            
+            // Draw game elements
+            drawFlowers();
+            drawGoldenFlowers();
+            drawPurpleFlowers();
+            drawRedRoses();
+            drawBlueFlowers();
+            drawWhiteFlowers();
+            drawNets();
+            drawBirds();
+            drawGiantBirds();
+            drawButterfly();
+            
+            // Only draw butterfly2 in 2-player mode or teams mode
+            if (gameState.gameMode === 'twoPlayer' || gameState.gameMode === 'teams') {
+                drawButterfly2();
+            }
+            
+            // Draw UI
+            drawUI();
+        }
+
+        function gameLoop() {
+            // Only update and render if not in menu mode
+            if (gameState.gameStatus !== 'menu') {
+                updateGame();
+                render();
+            } else {
+                // When in menu mode, just draw a static background
+                ctx.fillStyle = '#4A7C59';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                drawStaticBackground();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutter Dodge</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #87CEEB, #4682B4);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        #gameContainer {
+            position: relative;
+            border: 2px solid #333;
+            background: linear-gradient(to bottom, #87CEEB, #4682B4);
+        }
+        
+        #gameCanvas {
+            display: block;
+        }
+        
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+        
+        .score {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        
+        #gameOver h1 {
+            color: #ff4444;
+            margin: 0 0 20px 0;
+            font-size: 32px;
+        }
+        
+        #gameOver button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        #gameOver button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="ui">
+            <div class="score" id="score">Score: 0</div>
+            <div class="score" id="highScore">High Score: 0</div>
+        </div>
+        <div id="gameOver">
+            <h1>Game Over!</h1>
+            <p id="finalScore">Final Score: 0</p>
+            <button onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const highScoreElement = document.getElementById('highScore');
+        const gameOverElement = document.getElementById('gameOver');
+        const finalScoreElement = document.getElementById('finalScore');
+
+        // Game state
+        let gameState = {
+            butterfly: { x: 100, y: 300, width: 40, height: 40, speed: 5 },
+            flowers: [],
+            nets: [],
+            score: 0,
+            highScore: 0,
+            gameOver: false,
+            screenWidth: 800,
+            screenHeight: 600
+        };
+
+        // Input handling
+        let isMovingUp = false;
+        let isMovingDown = false;
+
+        // Event listeners
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseup', handleMouseUp);
+        canvas.addEventListener('touchstart', handleTouchStart);
+        canvas.addEventListener('touchmove', handleTouchMove);
+        canvas.addEventListener('touchend', handleTouchEnd);
+
+        function handleMouseDown(e) {
+            const rect = canvas.getBoundingClientRect();
+            const y = e.clientY - rect.top;
+            handleInput(y);
+        }
+
+        function handleMouseMove(e) {
+            if (e.buttons === 1) {
+                const rect = canvas.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                handleInput(y);
+            }
+        }
+
+        function handleMouseUp() {
+            isMovingUp = false;
+            isMovingDown = false;
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            handleInput(y);
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const y = e.touches[0].clientY - rect.top;
+            handleInput(y);
+        }
+
+        function handleTouchEnd() {
+            isMovingUp = false;
+            isMovingDown = false;
+        }
+
+        function handleInput(y) {
+            if (gameState.gameOver) return;
+            
+            const centerY = canvas.height / 2;
+            if (y < centerY) {
+                isMovingUp = true;
+                isMovingDown = false;
+            } else {
+                isMovingUp = false;
+                isMovingDown = true;
+            }
+        }
+
+        // Game functions
+        function updateGame() {
+            if (gameState.gameOver) return;
+
+            // Update butterfly
+            if (isMovingUp && gameState.butterfly.y > 0) {
+                gameState.butterfly.y -= gameState.butterfly.speed;
+            }
+            if (isMovingDown && gameState.butterfly.y < canvas.height - gameState.butterfly.height) {
+                gameState.butterfly.y += gameState.butterfly.speed;
+            }
+
+            // Update flowers
+            gameState.flowers.forEach(flower => {
+                flower.x -= flower.speed;
+            });
+            gameState.flowers = gameState.flowers.filter(flower => flower.x + flower.width > 0);
+
+            // Update nets
+            gameState.nets.forEach(net => {
+                net.x -= net.speed;
+            });
+            gameState.nets = gameState.nets.filter(net => net.x + net.width > 0);
+
+            // Spawn new flowers
+            if (Math.random() < 0.02) {
+                spawnFlower();
+            }
+
+            // Spawn new nets
+            if (Math.random() < 0.01) {
+                spawnNet();
+            }
+
+            // Check collisions
+            checkCollisions();
+        }
+
+        function spawnFlower() {
+            gameState.flowers.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 30),
+                width: 30,
+                height: 30,
+                speed: 3,
+                collected: false
+            });
+        }
+
+        function spawnNet() {
+            gameState.nets.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 50),
+                width: 50,
+                height: 50,
+                speed: 3
+            });
+        }
+
+        function checkCollisions() {
+            // Check flower collisions
+            gameState.flowers.forEach(flower => {
+                if (!flower.collected && isColliding(gameState.butterfly, flower)) {
+                    flower.collected = true;
+                    gameState.score += 10;
+                    if (gameState.score > gameState.highScore) {
+                        gameState.highScore = gameState.score;
+                    }
+                }
+            });
+
+            // Check net collisions
+            gameState.nets.forEach(net => {
+                if (isColliding(gameState.butterfly, net)) {
+                    gameOver();
+                }
+            });
+        }
+
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+
+        function gameOver() {
+            gameState.gameOver = true;
+            finalScoreElement.textContent = `Final Score: ${gameState.score}`;
+            gameOverElement.style.display = 'block';
+        }
+
+        function resetGame() {
+            gameState.butterfly = { x: 100, y: 300, width: 40, height: 40, speed: 5 };
+            gameState.flowers = [];
+            gameState.nets = [];
+            gameState.score = 0;
+            gameState.gameOver = false;
+            gameOverElement.style.display = 'none';
+            isMovingUp = false;
+            isMovingDown = false;
+        }
+
+        function drawButterfly() {
+            const b = gameState.butterfly;
+            
+            // Butterfly body
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(b.x + 16, b.y + 10, 8, 20);
+            
+            // Wings
+            ctx.fillStyle = '#FFA500';
+            ctx.fillRect(b.x + 5, b.y + 5, 15, 12);
+            ctx.fillRect(b.x + 20, b.y + 5, 15, 12);
+            
+            // Antennae
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(b.x + 18, b.y + 8);
+            ctx.lineTo(b.x + 15, b.y + 2);
+            ctx.moveTo(b.x + 22, b.y + 8);
+            ctx.lineTo(b.x + 25, b.y + 2);
+            ctx.stroke();
+        }
+
+        function drawFlowers() {
+            gameState.flowers.forEach(flower => {
+                if (flower.collected) return;
+                
+                // Flower petals
+                ctx.fillStyle = '#FF69B4';
+                ctx.beginPath();
+                ctx.arc(flower.x + 15, flower.y + 15, 10, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Flower center
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(flower.x + 15, flower.y + 15, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Stem
+                ctx.strokeStyle = '#228B22';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(flower.x + 15, flower.y + 25);
+                ctx.lineTo(flower.x + 15, flower.y + 35);
+                ctx.stroke();
+            });
+        }
+
+        function drawNets() {
+            gameState.nets.forEach(net => {
+                // Net handle
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(net.x + 20, net.y - 10, 4, 15);
+                
+                // Net rim
+                ctx.fillStyle = '#A0522D';
+                ctx.fillRect(net.x, net.y, net.width, 8);
+                
+                // Net mesh
+                ctx.fillStyle = '#D3D3D3';
+                ctx.fillRect(net.x, net.y + 8, net.width, net.height - 8);
+                
+                // Draw mesh lines
+                ctx.strokeStyle = '#696969';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= 8; i++) {
+                    const x = net.x + (net.width / 8) * i;
+                    ctx.beginPath();
+                    ctx.moveTo(x, net.y + 8);
+                    ctx.lineTo(x, net.y + net.height);
+                    ctx.stroke();
+                }
+                for (let i = 0; i <= 6; i++) {
+                    const y = net.y + 8 + (net.height - 8) / 6 * i;
+                    ctx.beginPath();
+                    ctx.moveTo(net.x, y);
+                    ctx.lineTo(net.x + net.width, y);
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function drawBackground() {
+            // Draw clouds
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 5; i++) {
+                const x = (canvas.width / 5) * i;
+                const y = 50 + (i % 2) * 100;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 30, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 20, y, 25, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(x + 40, y, 30, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawUI() {
+            scoreElement.textContent = `Score: ${gameState.score}`;
+            highScoreElement.textContent = `High Score: ${gameState.highScore}`;
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background
+            drawBackground();
+            
+            // Draw game objects
+            drawFlowers();
+            drawNets();
+            drawButterfly();
+            
+            // Update UI
+            drawUI();
+        }
+
+        function gameLoop() {
+            updateGame();
+            render();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>
