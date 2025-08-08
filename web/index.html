@@ -1011,10 +1011,14 @@
                 if (!net.collected) {
                     if (!gameState.isBeeDead && !gameState.butterfly.hasImmunity && isColliding(gameState.butterfly, net)) {
                         net.collected = true;
+                        gameState.score1 = Math.max(0, gameState.score1 - 1); // Decrease score by 1, minimum 0
                         activateGlobalSlow(); // Activate 3-second global slow effect
+                        console.log("Bee hit cobweb! Score decreased by 1. New score: " + gameState.score1);
                     } else if (!gameState.isButterflyDead && !gameState.butterfly2.hasImmunity && isColliding(gameState.butterfly2, net)) {
                         net.collected = true;
+                        gameState.score2 = Math.max(0, gameState.score2 - 1); // Decrease score by 1, minimum 0
                         activateGlobalSlow(); // Activate 3-second global slow effect
+                        console.log("Butterfly hit cobweb! Score decreased by 1. New score: " + gameState.score2);
                     }
                 }
             });
