@@ -316,6 +316,7 @@
             gameStatus: 'menu', // 'menu', 'playing', 'paused', 'gameOver'
             isGlobalSlow: false,
             globalSlowEndTime: null,
+            slowMultiplier: 1, // Multiplier for cumulative slow effect (1 = normal, 2 = twice as slow, etc.)
             isImmunityFlashing: false,
             gameOver: false,
             screenWidth: 800,
@@ -1370,6 +1371,8 @@
                 if (Date.now() > gameState.globalSlowEndTime) {
                     gameState.isGlobalSlow = false;
                     gameState.globalSlowEndTime = null;
+                    gameState.slowMultiplier = 1; // Reset slow multiplier
+                    console.log("Global slow effect ended. Slow multiplier reset to 1.");
                     // Reset all entity speeds to normal
                     resetAllSpeeds();
                 }
@@ -1472,34 +1475,39 @@
         function activateGlobalSlow() {
             gameState.isGlobalSlow = true;
             gameState.globalSlowEndTime = new Date(Date.now() + 3000); // 3 second global slow
+            gameState.slowMultiplier++; // Increase slow multiplier (1 -> 2 -> 3 -> etc.)
+            console.log("Cobweb hit! Slow multiplier increased to: " + gameState.slowMultiplier);
             // Slow down all entities
             slowAllEntities();
         }
 
         function slowAllEntities() {
+            const baseSlowSpeed = 1.5; // Base slow speed
+            const slowSpeed = baseSlowSpeed / gameState.slowMultiplier; // Apply multiplier
+            
             // Slow down flowers
             gameState.flowers.forEach(flower => {
-                flower.speed = 1.5; // Half speed
+                flower.speed = slowSpeed;
             });
             
             // Slow down golden flowers
             gameState.goldenFlowers.forEach(goldenFlower => {
-                goldenFlower.speed = 1.5;
+                goldenFlower.speed = slowSpeed;
             });
             
             // Slow down purple flowers
             gameState.purpleFlowers.forEach(purpleFlower => {
-                purpleFlower.speed = 1.5;
+                purpleFlower.speed = slowSpeed;
             });
             
             // Slow down birds
             gameState.birds.forEach(bird => {
-                bird.speed = 1.5;
+                bird.speed = slowSpeed;
             });
             
             // Slow down nets
             gameState.nets.forEach(net => {
-                net.speed = 1.5;
+                net.speed = slowSpeed;
             });
             
             // Giant birds are immune to global slow effect
@@ -1589,6 +1597,9 @@
             gameState.lastBlueFlowerSpawn = 0; // Reset blue flower spawn tracking
             gameState.whiteFlowers = []; // Reset white flowers
             gameState.lastWhiteFlowerSpawn = 0; // Reset white flower spawn tracking
+            gameState.isGlobalSlow = false; // Reset global slow
+            gameState.globalSlowEndTime = null; // Reset global slow end time
+            gameState.slowMultiplier = 1; // Reset slow multiplier
             gameOverElement.style.display = 'none';
             controlsElement.style.display = 'block';
         }
@@ -1608,25 +1619,25 @@
             // Update speed of all existing flowers
             gameState.flowers.forEach(flower => {
                 const baseSpeed = gameState.globalSpeed - 5;
-                flower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+                flower.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
             
             // Update speed of all existing golden flowers
             gameState.goldenFlowers.forEach(goldenFlower => {
                 const baseSpeed = gameState.globalSpeed - 5;
-                goldenFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+                goldenFlower.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
             
             // Update speed of all existing purple flowers
             gameState.purpleFlowers.forEach(purpleFlower => {
                 const baseSpeed = gameState.globalSpeed - 5;
-                purpleFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+                purpleFlower.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
             
             // Update speed of all existing birds
             gameState.birds.forEach(bird => {
                 const baseSpeed = gameState.globalSpeed - 5;
-                bird.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+                bird.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
             
             // Update speed of all existing giant birds
@@ -1638,7 +1649,7 @@
             // Update speed of all existing nets
             gameState.nets.forEach(net => {
                 const baseSpeed = gameState.globalSpeed - 5;
-                net.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
+                net.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
             
             // Update speed of all existing red roses
