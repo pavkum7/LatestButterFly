@@ -2,11 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Flutter Dodge</title>
     <style>
         body {
+        body {
             margin: 0;
+            padding: 0;
+            background: #4A7C59;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+            touch-action: none;
+        }
+        
+        #gameContainer {
+            position: relative;
+            border: 2px solid #333;
+            background: #4A7C59;
+            max-width: 100vw;
+            max-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #gameCanvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+        }        * {
+            box-sizing: border-box;
+        }            margin: 0;
             padding: 0;
             background: #4A7C59;
             font-family: Arial, sans-serif;
@@ -123,7 +156,150 @@
         }
         
         #menu button:hover {
-            opacity: 0.8;
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            #gameContainer {
+                border: 1px solid #333;
+                max-width: calc(100vw - 10px);
+                max-height: calc(100vh - 10px);
+            }
+            
+            #menu {
+                min-width: 90vw;
+                max-width: 90vw;
+                padding: 20px;
+            }
+            
+            #menu h1 {
+                font-size: 24px;
+            }
+            
+            #menu button {
+                width: 120px;
+                padding: 12px 20px;
+                font-size: 16px;
+                margin: 5px;
+            }
+            
+            .score {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+            
+            #pauseButton {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            #controls button {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            
+            #butterflyLabel, #beeLabel {
+                font-size: 20px;
+            }
+            
+            #pauseOverlay {
+                padding: 20px;
+            }
+            
+            #pauseOverlay h2 {
+                font-size: 24px;
+            }
+            
+            #pauseOverlay p {
+                font-size: 14px;
+            }
+            
+            #pauseOverlay button {
+                padding: 12px 24px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #menu {
+                min-width: 95vw;
+                max-width: 95vw;
+                padding: 15px;
+            }
+            
+            #menu h1 {
+                font-size: 20px;
+            }
+            
+            #menu button {
+                width: 100px;
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .score {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            #pauseButton {
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+            }
+            
+            #controls button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+            
+            #pauseOverlay {
+                padding: 15px;
+            }
+            
+            #pauseOverlay h2 {
+                font-size: 20px;
+            }
+            
+            #pauseOverlay p {
+                font-size: 12px;
+            }
+            
+            #pauseOverlay button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+        
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #menu {
+                padding: 20px;
+            }
+            
+            #menu h1 {
+                font-size: 20px;
+                margin: 0 0 10px 0;
+            }
+            
+            #menu button {
+                padding: 8px 16px;
+                font-size: 14px;
+                margin: 2px;
+            }
+            
+            .score {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+        }            opacity: 0.8;
         }
     </style>
 </head>
@@ -277,7 +453,50 @@
 
     <script>
         const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        // Responsive canvas sizing
+        function resizeCanvas() {
+            const container = document.getElementById("gameContainer");
+            const containerRect = container.getBoundingClientRect();
+            const aspectRatio = 800 / 600; // Original game aspect ratio
+            
+            let newWidth, newHeight;
+            
+            if (containerRect.width / containerRect.height > aspectRatio) {
+                // Container is wider than game aspect ratio
+                newHeight = Math.min(containerRect.height, window.innerHeight * 0.9);
+                newWidth = newHeight * aspectRatio;
+            } else {
+                // Container is taller than game aspect ratio
+                newWidth = Math.min(containerRect.width, window.innerWidth * 0.9);
+                newHeight = newWidth / aspectRatio;
+            }
+            
+            // Ensure minimum size
+            newWidth = Math.max(newWidth, 300);
+            newHeight = Math.max(newHeight, 225);
+            
+            canvas.style.width = newWidth + "px";
+            canvas.style.height = newHeight + "px";
+            
+            // Update canvas internal resolution for crisp rendering
+            const scale = window.devicePixelRatio || 1;
+            canvas.width = newWidth * scale;
+            canvas.height = newHeight * scale;
+            ctx.scale(scale, scale);
+            
+            console.log(`Canvas resized to: ${newWidth}x${newHeight} (scale: ${scale})`);
+        }
+        
+        // Initialize responsive design
+        window.addEventListener("resize", resizeCanvas);
+        window.addEventListener("orientationchange", () => {
+            setTimeout(resizeCanvas, 100);
+        });
+        
+        // Initialize canvas size after DOM is loaded
+        document.addEventListener("DOMContentLoaded", () => {
+            resizeCanvas();
+        });        const ctx = canvas.getContext('2d');
         const score1Element = document.getElementById('score1');
         const score2Element = document.getElementById('score2');
         const highScore1Element = document.getElementById('highScore1');
