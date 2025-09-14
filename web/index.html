@@ -2,44 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flutter Dodge</title>
     <style>
         body {
-        body {
             margin: 0;
-            padding: 0;
-            background: #4A7C59;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
-            touch-action: none;
-        }
-        
-        #gameContainer {
-            position: relative;
-            border: 2px solid #333;
-            background: #4A7C59;
-            max-width: 100vw;
-            max-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        #gameCanvas {
-            display: block;
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-        }        * {
-            box-sizing: border-box;
-        }            margin: 0;
             padding: 0;
             background: #4A7C59;
             font-family: Arial, sans-serif;
@@ -156,150 +123,7 @@
         }
         
         #menu button:hover {
-        }
-        
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-            }
-            
-            #gameContainer {
-                border: 1px solid #333;
-                max-width: calc(100vw - 10px);
-                max-height: calc(100vh - 10px);
-            }
-            
-            #menu {
-                min-width: 90vw;
-                max-width: 90vw;
-                padding: 20px;
-            }
-            
-            #menu h1 {
-                font-size: 24px;
-            }
-            
-            #menu button {
-                width: 120px;
-                padding: 12px 20px;
-                font-size: 16px;
-                margin: 5px;
-            }
-            
-            .score {
-                font-size: 14px;
-                padding: 8px 15px;
-            }
-            
-            #pauseButton {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-            
-            #controls button {
-                width: 60px;
-                height: 60px;
-                font-size: 24px;
-            }
-            
-            #butterflyLabel, #beeLabel {
-                font-size: 20px;
-            }
-            
-            #pauseOverlay {
-                padding: 20px;
-            }
-            
-            #pauseOverlay h2 {
-                font-size: 24px;
-            }
-            
-            #pauseOverlay p {
-                font-size: 14px;
-            }
-            
-            #pauseOverlay button {
-                padding: 12px 24px;
-                font-size: 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            #menu {
-                min-width: 95vw;
-                max-width: 95vw;
-                padding: 15px;
-            }
-            
-            #menu h1 {
-                font-size: 20px;
-            }
-            
-            #menu button {
-                width: 100px;
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-            
-            .score {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-            
-            #pauseButton {
-                width: 45px;
-                height: 45px;
-                font-size: 18px;
-            }
-            
-            #controls button {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-            
-            #pauseOverlay {
-                padding: 15px;
-            }
-            
-            #pauseOverlay h2 {
-                font-size: 20px;
-            }
-            
-            #pauseOverlay p {
-                font-size: 12px;
-            }
-            
-            #pauseOverlay button {
-                padding: 10px 20px;
-                font-size: 14px;
-            }
-        }
-        
-        /* Landscape mobile */
-        @media (max-height: 500px) and (orientation: landscape) {
-            #menu {
-                padding: 20px;
-            }
-            
-            #menu h1 {
-                font-size: 20px;
-                margin: 0 0 10px 0;
-            }
-            
-            #menu button {
-                padding: 8px 16px;
-                font-size: 14px;
-                margin: 2px;
-            }
-            
-            .score {
-                font-size: 12px;
-                padding: 6px 12px;
-            }
-        }            opacity: 0.8;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -446,57 +270,14 @@
                 <p style="margin: 10px 0; font-weight: bold; color: #7b1fa2;">💜 THE PURPLE HEART WILL GIVE 7 POINTS AND WILL GIVE YOU IMMORTALITY FOR 15 SECONDS</p>
                 <p style="margin: 10px 0; font-weight: bold; color: #1976d2;">💙 BLUE FLOWERS: 15 POINTS + 30-SECOND IMMORTALITY</p>
                 <p style="margin: 10px 0; font-weight: bold; color: #757575;">🤍 WHITE FLOWERS: CHANCE OF 20 POINTS OR INCREASING BIRD SPAWN RATES</p>
-            </div>
+                <p style="margin: 10px 0; font-weight: bold; color: #FFD700;">🍯 HONEY POTS: 50 POINTS + RESET SPEED + 2-MINUTE IMMORTALITY (EVERY 100 FLOWERS)</p>            </div>
             <button onclick="hideRules()" style="background-color: #4CAF50; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 20px; font-weight: bold;">Got it!</button>
         </div>
     </div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
-        // Responsive canvas sizing
-        function resizeCanvas() {
-            const container = document.getElementById("gameContainer");
-            const containerRect = container.getBoundingClientRect();
-            const aspectRatio = 800 / 600; // Original game aspect ratio
-            
-            let newWidth, newHeight;
-            
-            if (containerRect.width / containerRect.height > aspectRatio) {
-                // Container is wider than game aspect ratio
-                newHeight = Math.min(containerRect.height, window.innerHeight * 0.9);
-                newWidth = newHeight * aspectRatio;
-            } else {
-                // Container is taller than game aspect ratio
-                newWidth = Math.min(containerRect.width, window.innerWidth * 0.9);
-                newHeight = newWidth / aspectRatio;
-            }
-            
-            // Ensure minimum size
-            newWidth = Math.max(newWidth, 300);
-            newHeight = Math.max(newHeight, 225);
-            
-            canvas.style.width = newWidth + "px";
-            canvas.style.height = newHeight + "px";
-            
-            // Update canvas internal resolution for crisp rendering
-            const scale = window.devicePixelRatio || 1;
-            canvas.width = newWidth * scale;
-            canvas.height = newHeight * scale;
-            ctx.scale(scale, scale);
-            
-            console.log(`Canvas resized to: ${newWidth}x${newHeight} (scale: ${scale})`);
-        }
-        
-        // Initialize responsive design
-        window.addEventListener("resize", resizeCanvas);
-        window.addEventListener("orientationchange", () => {
-            setTimeout(resizeCanvas, 100);
-        });
-        
-        // Initialize canvas size after DOM is loaded
-        document.addEventListener("DOMContentLoaded", () => {
-            resizeCanvas();
-        });        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
         const score1Element = document.getElementById('score1');
         const score2Element = document.getElementById('score2');
         const highScore1Element = document.getElementById('highScore1');
@@ -547,7 +328,10 @@
             blueFlowers: [], // Array to store blue flowers
             lastBlueFlowerSpawn: 0, // Track when blue flower was last spawned
             whiteFlowers: [], // Array to store white flowers
-            lastWhiteFlowerSpawn: 0 // Track when white flower was last spawned
+            lastWhiteFlowerSpawn: 0, 
+            honeyPots: [], 
+            lastHoneyPotSpawn: 0, 
+            honeyPotCollected: 0 // Track when white flower was last spawned
         };
         
         function selectOnePlayer() {
@@ -637,98 +421,644 @@
         upButton.addEventListener('mousedown', () => {
             isMovingUp = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         upButton.addEventListener('mouseup', () => {
             isMovingUp = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         upButton.addEventListener('mouseleave', () => {
             isMovingUp = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         downButton.addEventListener('mousedown', () => {
             isMovingDown = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         downButton.addEventListener('mouseup', () => {
             isMovingDown = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         downButton.addEventListener('mouseleave', () => {
             isMovingDown = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         // Butterfly controls (left side)
         wButton.addEventListener('mousedown', () => {
             isMovingButterfly2Up = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         wButton.addEventListener('mouseup', () => {
             isMovingButterfly2Up = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         wButton.addEventListener('mouseleave', () => {
             isMovingButterfly2Up = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         sButton.addEventListener('mousedown', () => {
             isMovingButterfly2Down = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         sButton.addEventListener('mouseup', () => {
             isMovingButterfly2Down = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         sButton.addEventListener('mouseleave', () => {
             isMovingButterfly2Down = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         // Pause button event listener
         pauseButton.addEventListener('click', () => {
             pauseGame();
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         // Touch events for mobile
         upButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isMovingUp = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         upButton.addEventListener('touchend', (e) => {
             e.preventDefault();
             isMovingUp = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         downButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isMovingDown = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         downButton.addEventListener('touchend', (e) => {
             e.preventDefault();
             isMovingDown = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         wButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isMovingButterfly2Up = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         wButton.addEventListener('touchend', (e) => {
             e.preventDefault();
             isMovingButterfly2Up = false;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         sButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isMovingButterfly2Down = true;
         });
+        }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        
         sButton.addEventListener('touchend', (e) => {
             e.preventDefault();
             isMovingButterfly2Down = false;
         });
-
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
         // Keyboard event listeners
         document.addEventListener('keydown', handleKeyDown);
         document.addEventListener('keyup', handleKeyUp);
@@ -908,49 +1238,260 @@
             gameState.flowers.forEach(flower => {
                 flower.x -= flower.speed;
             });
-            gameState.flowers = gameState.flowers.filter(flower => flower.x + flower.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.flowers = gameState.flowers.filter(flower => flower.x + flower.width > 0);
 
             // Update golden flowers
             gameState.goldenFlowers.forEach(goldenFlower => {
                 goldenFlower.x -= goldenFlower.speed;
             });
-            gameState.goldenFlowers = gameState.goldenFlowers.filter(goldenFlower => goldenFlower.x + goldenFlower.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.goldenFlowers = gameState.goldenFlowers.filter(goldenFlower => goldenFlower.x + goldenFlower.width > 0);
             
             // Update purple flowers
             gameState.purpleFlowers.forEach(purpleFlower => {
                 purpleFlower.x -= purpleFlower.speed;
             });
-            gameState.purpleFlowers = gameState.purpleFlowers.filter(purpleFlower => purpleFlower.x + purpleFlower.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.purpleFlowers = gameState.purpleFlowers.filter(purpleFlower => purpleFlower.x + purpleFlower.width > 0);
 
             // Update red roses
             gameState.redRoses.forEach(redRose => {
                 redRose.x -= redRose.speed;
             });
-            gameState.redRoses = gameState.redRoses.filter(redRose => redRose.x + redRose.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.redRoses = gameState.redRoses.filter(redRose => redRose.x + redRose.width > 0);
 
             // Update blue flowers
             gameState.blueFlowers.forEach(blueFlower => {
                 blueFlower.x -= blueFlower.speed;
             });
-            gameState.blueFlowers = gameState.blueFlowers.filter(blueFlower => blueFlower.x + blueFlower.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.blueFlowers = gameState.blueFlowers.filter(blueFlower => blueFlower.x + blueFlower.width > 0);
             
             // Update white flowers
-            gameState.whiteFlowers.forEach(whiteFlower => {
+            // Update honey pots
+            gameState.honeyPots.forEach(honeyPot => {
+                honeyPot.x -= honeyPot.speed;
+            });            gameState.whiteFlowers.forEach(whiteFlower => {
                 whiteFlower.x -= whiteFlower.speed;
             });
-            gameState.whiteFlowers = gameState.whiteFlowers.filter(whiteFlower => whiteFlower.x + whiteFlower.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.whiteFlowers = gameState.whiteFlowers.filter(whiteFlower => whiteFlower.x + whiteFlower.width > 0);
 
             // Update birds
             gameState.birds.forEach(bird => {
                 bird.x -= bird.speed;
             });
-            gameState.birds = gameState.birds.filter(bird => bird.x + bird.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.birds = gameState.birds.filter(bird => bird.x + bird.width > 0);
 
             // Update nets
             gameState.nets.forEach(net => {
                 net.x -= net.speed;
             });
-            gameState.nets = gameState.nets.filter(net => net.x + net.width > 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.nets = gameState.nets.filter(net => net.x + net.width > 0);
 
             // Update giant birds (coming from the front)
             gameState.giantBirds.forEach(giantBird => {
@@ -964,7 +1505,33 @@
                     giantBird.y -= giantBird.speed * 0.5; // Move up
                 }
             });
-            gameState.giantBirds = gameState.giantBirds.filter(giantBird => giantBird.x + giantBird.width < 0);
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            gameState.giantBirds = gameState.giantBirds.filter(giantBird => giantBird.x + giantBird.width < 0);
 
             // Spawn new flowers (max 5 per screen)
             if (gameState.flowers.length < 5 && Math.random() < 0.09) {
@@ -997,6 +1564,32 @@
                 collected: false
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function spawnGoldenFlower() {
             const baseSpeed = gameState.globalSpeed - 5; // Golden flowers move slightly slower than butterflies
@@ -1010,6 +1603,32 @@
                 collected: false
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function spawnNet() {
             const baseSpeed = gameState.globalSpeed - 5; // Nets move slightly slower than butterflies
@@ -1023,6 +1642,32 @@
                 collected: false
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function spawnGiantBird() {
             // Giant birds are immune to global slow effect
@@ -1038,6 +1683,32 @@
             });
         }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
+        
         function spawnPurpleFlower() {
             const baseSpeed = gameState.globalSpeed - 5; // Purple flowers move slightly slower than butterflies
             const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
@@ -1050,6 +1721,32 @@
                 collected: false
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function spawnBird() {
             const baseSpeed = gameState.globalSpeed - 5; // Birds move slightly slower than butterflies
@@ -1064,6 +1761,32 @@
                 isGiantBird: isGiantBird
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function spawnRedRose() {
             const baseSpeed = gameState.globalSpeed - 5; // Red roses move slightly slower than butterflies
@@ -1077,6 +1800,32 @@
                 collected: false
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function spawnBlueFlower() {
             const baseSpeed = gameState.globalSpeed - 5; // Blue flowers move slightly slower than butterflies
@@ -1091,6 +1840,32 @@
             });
         }
         
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
+        
         function spawnWhiteFlower() {
             const baseSpeed = gameState.globalSpeed - 3; // White flowers move slightly slower than butterflies
             const speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed; // Slow speed if global slow is active
@@ -1102,8 +1877,75 @@
                 speed: speed,
                 collected: false
             });
-            console.log("White flower spawned! Total white flowers:", gameState.whiteFlowers.length);
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            console.log("White flower spawned! Total white flowers:", gameState.whiteFlowers.length);
+        }
+        
+        function spawnHoneyPot() {
+            const baseSpeed = gameState.globalSpeed - 2; // Honey pots move slightly slower than butterflies
+            const speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed; // Apply slow multiplier if global slow is active
+            gameState.honeyPots.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 24),
+                width: 24,
+                height: 24,
+                speed: speed,
+                collected: false,
+                goldenLight: true // Special effect flag
+            });
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            console.log("Honey pot spawned! Total honey pots:", gameState.honeyPots.length);
+        }        }
 
         function checkCollisions() {
             // Check flower collisions
@@ -1166,6 +2008,13 @@
                             spawnWhiteFlower();
                             gameState.lastWhiteFlowerSpawn = gameState.flowersCollected1;
                         }
+                        
+                        // Spawn honey pot every 100 flowers collected
+                        if (gameState.flowersCollected1 % 100 === 0 && gameState.flowersCollected1 > gameState.lastHoneyPotSpawn) {
+                            console.log("Spawning honey pot for bee at flowers collected:", gameState.flowersCollected1);
+                            spawnHoneyPot();
+                            gameState.lastHoneyPotSpawn = gameState.flowersCollected1;
+                        }                        }
                     } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, flower)) {
                         flower.collected = true;
                         gameState.score2 += 1;
@@ -1223,10 +2072,40 @@
                             spawnWhiteFlower();
                             gameState.lastWhiteFlowerSpawn = gameState.flowersCollected2;
                         }
+                        
+                        // Spawn honey pot every 100 flowers collected (for butterfly2)
+                        if (gameState.flowersCollected2 % 100 === 0 && gameState.flowersCollected2 > gameState.lastHoneyPotSpawn) {
+                            console.log("Spawning honey pot for butterfly at flowers collected:", gameState.flowersCollected2);n                            spawnHoneyPot();n                            gameState.lastHoneyPotSpawn = gameState.flowersCollected2;n                        }                        }
                     }
                 }
             });
-
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
             // Check net collisions
             gameState.nets.forEach(net => {
                 if (!net.collected) {
@@ -1243,7 +2122,33 @@
                     }
                 }
             });
-
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
             // Check golden flower collisions
             gameState.goldenFlowers.forEach(goldenFlower => {
                 if (!goldenFlower.collected) {
@@ -1290,7 +2195,33 @@
                     }
                 }
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Check purple flower collisions
             gameState.purpleFlowers.forEach(purpleFlower => {
                 if (!purpleFlower.collected) {
@@ -1335,7 +2266,33 @@
                     }
                 }
             });
-
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
             // Check red rose collisions
             gameState.redRoses.forEach(redRose => {
                 if (!redRose.collected) {
@@ -1396,7 +2353,33 @@
                     }
                 }
             });
-
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
             // Check blue flower collisions
             gameState.blueFlowers.forEach(blueFlower => {
                 if (!blueFlower.collected) {
@@ -1459,7 +2442,33 @@
                     }
                 }
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Check white flower collisions
             gameState.whiteFlowers.forEach(whiteFlower => {
                 if (!whiteFlower.collected) {
@@ -1520,8 +2529,120 @@
                     }
                 }
             });
-
-            // Check bird collisions
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
+            // Check honey pot collisions
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    if (!gameState.isBeeDead && isColliding(gameState.butterfly, honeyPot)) {
+                        honeyPot.collected = true;
+                        gameState.honeyPotCollected += 1;
+                        console.log("Bee collected honey pot! Total honey pots:", gameState.honeyPotCollected);
+                        
+                        // Honey pot effects: 50 points, reset speed to starting speed, 2-minute immortality
+                        gameState.score1 += 50;
+                        gameState.globalSpeed = 8; // Reset to starting speed
+                        gameState.butterfly.hasImmunity = true;
+                        gameState.butterfly.immunityEndTime = new Date(Date.now() + 120000); // 2 minutes
+                        
+                        // Reset all entity speeds to starting speed
+                        resetAllSpeeds();
+                        
+                        if (gameState.gameMode === onePlayer) {
+                            if (gameState.score1 > gameState.highScore1Player) {
+                                gameState.highScore1Player = gameState.score1;
+                            }
+                        } else if (gameState.gameMode === teams) {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score1 > gameState.highScore1) {
+                                gameState.highScore1 = gameState.score1;
+                            }
+                        }
+                    } else if (!gameState.isButterflyDead && isColliding(gameState.butterfly2, honeyPot)) {
+                        honeyPot.collected = true;
+                        gameState.honeyPotCollected += 1;
+                        console.log("Butterfly collected honey pot! Total honey pots:", gameState.honeyPotCollected);
+                        
+                        // Honey pot effects: 50 points, reset speed to starting speed, 2-minute immortality
+                        gameState.score2 += 50;
+                        gameState.globalSpeed = 8; // Reset to starting speed
+                        gameState.butterfly2.hasImmunity = true;
+                        gameState.butterfly2.immunityEndTime = new Date(Date.now() + 120000); // 2 minutes
+                        
+                        // Reset all entity speeds to starting speed
+                        resetAllSpeeds();
+                        
+                        if (gameState.gameMode === onePlayer) {
+                            if (gameState.score2 > gameState.highScore2Player) {
+                                gameState.highScore2Player = gameState.score2;
+                            }
+                        } else if (gameState.gameMode === teams) {
+                            if (getCombinedScore() > gameState.highScoreTeams) {
+                                gameState.highScoreTeams = getCombinedScore();
+                            }
+                        } else {
+                            if (gameState.score2 > gameState.highScore2) {
+                                gameState.highScore2 = gameState.score2;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }                        // Check bird collisions
             gameState.birds.forEach(bird => {
                 // Use different hitbox sizes based on bird type
                 let birdHitbox;
@@ -1551,7 +2672,33 @@
                     checkGameOver();
                 }
             });
-
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
             // Check giant bird collisions
             gameState.giantBirds.forEach(giantBird => {
                 if (!gameState.butterfly.hasImmunity && isColliding(gameState.butterfly, giantBird) && !gameState.isBeeDead) {
@@ -1564,6 +2711,32 @@
                 }
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function checkGameOver() {
             // Game over logic depends on game mode
@@ -1708,27 +2881,157 @@
             gameState.flowers.forEach(flower => {
                 flower.speed = slowSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Slow down golden flowers
             gameState.goldenFlowers.forEach(goldenFlower => {
                 goldenFlower.speed = slowSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Slow down purple flowers
             gameState.purpleFlowers.forEach(purpleFlower => {
                 purpleFlower.speed = slowSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Slow down birds
             gameState.birds.forEach(bird => {
                 bird.speed = slowSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Slow down nets
             gameState.nets.forEach(net => {
                 net.speed = slowSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Giant birds are immune to global slow effect
             // They maintain their normal speed
         }
@@ -1738,27 +3041,157 @@
             gameState.flowers.forEach(flower => {
                 flower.speed = 3;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Reset golden flower speeds
             gameState.goldenFlowers.forEach(goldenFlower => {
                 goldenFlower.speed = 3;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Reset purple flower speeds
             gameState.purpleFlowers.forEach(purpleFlower => {
                 purpleFlower.speed = 3;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Reset bird speeds
             gameState.birds.forEach(bird => {
                 bird.speed = 3;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Reset net speeds
             gameState.nets.forEach(net => {
                 net.speed = 3;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Giant birds maintain their normal speed (immune to global slow)
         }
 
@@ -1769,7 +3202,7 @@
         function getCombinedHighScore() {
             return gameState.highScoreTeams;
         }
-        
+
         function resetGame() {
             gameState.butterfly = {
                 x: 100,
@@ -1815,7 +3248,9 @@
             gameState.blueFlowers = []; // Reset blue flowers
             gameState.lastBlueFlowerSpawn = 0; // Reset blue flower spawn tracking
             gameState.whiteFlowers = []; // Reset white flowers
-            gameState.lastWhiteFlowerSpawn = 0; // Reset white flower spawn tracking
+            gameState.honeyPots = []; // Reset honey pots
+            gameState.lastHoneyPotSpawn = 0; // Reset honey pot spawn tracking
+            gameState.honeyPotCollected = 0; // Reset honey pot collected count            gameState.lastWhiteFlowerSpawn = 0; // Reset white flower spawn tracking
             gameState.isGlobalSlow = false; // Reset global slow
             gameState.globalSlowEndTime = null; // Reset global slow end time
             gameState.slowMultiplier = 1; // Reset slow multiplier
@@ -1840,55 +3275,293 @@
                 const baseSpeed = gameState.globalSpeed - 5;
                 flower.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing golden flowers
             gameState.goldenFlowers.forEach(goldenFlower => {
                 const baseSpeed = gameState.globalSpeed - 5;
                 goldenFlower.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing purple flowers
             gameState.purpleFlowers.forEach(purpleFlower => {
                 const baseSpeed = gameState.globalSpeed - 5;
                 purpleFlower.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing birds
             gameState.birds.forEach(bird => {
                 const baseSpeed = gameState.globalSpeed - 5;
                 bird.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing giant birds
             gameState.giantBirds.forEach(giantBird => {
                 const baseSpeed = gameState.globalSpeed - 3;
                 giantBird.speed = baseSpeed; // Giant birds are immune to global slow
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing nets
             gameState.nets.forEach(net => {
                 const baseSpeed = gameState.globalSpeed - 5;
                 net.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing red roses
             gameState.redRoses.forEach(redRose => {
                 const baseSpeed = gameState.globalSpeed - 5;
                 redRose.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing blue flowers
             gameState.blueFlowers.forEach(blueFlower => {
                 const baseSpeed = gameState.globalSpeed - 5;
                 blueFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
             });
-            
+        }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }            
             // Update speed of all existing white flowers
-            gameState.whiteFlowers.forEach(whiteFlower => {
+            // Update speed of all existing honey pots
+            gameState.honeyPots.forEach(honeyPot => {
+                const baseSpeed = gameState.globalSpeed - 2;
+                honeyPot.speed = gameState.isGlobalSlow ? baseSpeed / gameState.slowMultiplier : baseSpeed;
+            });            gameState.whiteFlowers.forEach(whiteFlower => {
                 const baseSpeed = gameState.globalSpeed - 3;
                 whiteFlower.speed = gameState.isGlobalSlow ? baseSpeed * 0.5 : baseSpeed;
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function increaseGlobalSpeed() {
             gameState.globalSpeed += 1;
@@ -2022,6 +3695,32 @@
                 ctx.fillText('🌸', flower.x + flower.width/2, flower.y + flower.height/2);
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawGoldenFlowers() {
             gameState.goldenFlowers.forEach(goldenFlower => {
@@ -2041,6 +3740,32 @@
                 ctx.fillText('🌻', goldenFlower.x + goldenFlower.width/2, goldenFlower.y + goldenFlower.height/2);
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawBirds() {
             gameState.birds.forEach(bird => {
@@ -2062,6 +3787,32 @@
                 ctx.globalAlpha = 1.0;
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawNets() {
             gameState.nets.forEach(net => {
@@ -2085,6 +3836,32 @@
                 }
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawGiantBirds() {
             gameState.giantBirds.forEach(giantBird => {
@@ -2106,6 +3883,32 @@
                 ctx.globalAlpha = 1.0;
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawPurpleFlowers() {
             gameState.purpleFlowers.forEach(purpleFlower => {
@@ -2123,6 +3926,32 @@
                 }
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawRedRoses() {
             gameState.redRoses.forEach(redRose => {
@@ -2140,6 +3969,32 @@
                 }
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawBlueFlowers() {
             gameState.blueFlowers.forEach(blueFlower => {
@@ -2157,6 +4012,32 @@
                 }
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
         
         function drawWhiteFlowers() {
             if (gameState.whiteFlowers.length > 0) {
@@ -2177,6 +4058,32 @@
                 }
             });
         }
+        
+        function drawHoneyPots() {
+            gameState.honeyPots.forEach(honeyPot => {
+                if (!honeyPot.collected) {
+                    ctx.save();
+                    ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.font = "24px Arial";
+                    ctx.fillStyle = "#FFD700";
+                    ctx.fillText("🍯", honeyPot.x, honeyPot.y + 20);
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 20, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.3)";
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(honeyPot.x + 12, honeyPot.y + 12, 30, 0, 2 * Math.PI);
+                    ctx.strokeStyle = "rgba(255, 215, 0, 0.2)";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }        }
 
         function drawBackground() {
             // Draw clouds
@@ -2223,17 +4130,17 @@
                 score2Element.style.display = 'none';
                 highScore2Element.style.display = 'none';
             } else {
-                score1Element.textContent = `🐝 Score: ${gameState.score1}`;
-                highScore1Element.textContent = `🐝 High Score: ${gameState.gameMode === 'onePlayer' ? gameState.highScore1Player : gameState.highScore1}`;
-                
-                if (gameState.gameMode === 'twoPlayer') {
-                    score2Element.textContent = `🦋 Score: ${gameState.score2}`;
-                    highScore2Element.textContent = `🦋 High Score: ${gameState.highScore2}`;
-                    score2Element.style.display = 'block';
-                    highScore2Element.style.display = 'block';
-                } else {
-                    score2Element.style.display = 'none';
-                    highScore2Element.style.display = 'none';
+            score1Element.textContent = `🐝 Score: ${gameState.score1}`;
+            highScore1Element.textContent = `🐝 High Score: ${gameState.gameMode === 'onePlayer' ? gameState.highScore1Player : gameState.highScore1}`;
+            
+            if (gameState.gameMode === 'twoPlayer') {
+                score2Element.textContent = `🦋 Score: ${gameState.score2}`;
+                highScore2Element.textContent = `🦋 High Score: ${gameState.highScore2}`;
+                score2Element.style.display = 'block';
+                highScore2Element.style.display = 'block';
+            } else {
+                score2Element.style.display = 'none';
+                highScore2Element.style.display = 'none';
                 }
             }
         }
@@ -2253,7 +4160,7 @@
             drawRedRoses();
             drawBlueFlowers();
             drawWhiteFlowers();
-            drawNets();
+            drawHoneyPots();            drawNets();
             drawBirds();
             drawGiantBirds();
             drawButterfly();
@@ -2270,8 +4177,8 @@
         function gameLoop() {
             // Only update and render if not in menu mode
             if (gameState.gameStatus !== 'menu') {
-                updateGame();
-                render();
+            updateGame();
+            render();
             } else {
                 // When in menu mode, just draw a static background
                 ctx.fillStyle = '#4A7C59';
